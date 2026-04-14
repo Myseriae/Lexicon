@@ -33,6 +33,7 @@ ScaffoldingReadMe.txt
 
 # NuGet Packages
 *.nupkg
+
 # NuGet Symbol Packages
 *.snupkg
 
@@ -52,3 +53,65 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# ========================
+# Secrets & Configuration
+# ========================
+
+# User secrets (ASP.NET Core - never commit these)
+**/secrets.json
+appsettings.Development.json
+appsettings.Local.json
+
+# Connection strings and API keys if stored separately
+appsettings.Production.json
+
+# .env files (if used for local dev)
+.env
+.env.*
+
+# ========================
+# JetBrains Rider
+# ========================
+
+.idea/
+*.sln.iml
+
+# Rider shelf and local history
+.idea/shelf/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries/
+.idea/httpRequests/
+
+# ========================
+# EF Core
+# ========================
+
+# If you generate SQL scripts locally during development
+*.sql
+
+# ========================
+# Linux / OS
+# ========================
+
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ========================
+# Uploads & User Content
+# ========================
+
+# If articles allow file attachments in the future
+wwwroot/uploads/
+
+# ========================
+# Local Dev Tooling
+# ========================
+
+# dotnet-tools local config (keep the manifest, not the binaries)
+.config/
