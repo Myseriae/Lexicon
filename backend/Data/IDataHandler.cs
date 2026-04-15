@@ -8,4 +8,6 @@ public interface IDataHandler
         Article? GetArticleById(int id);
         Article AddArticle(Article article);
         bool DeleteArticle(int id);
+        
+        bool UpdateArticle(int id, Article article);
 }

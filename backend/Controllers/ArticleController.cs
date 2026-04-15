@@ -47,4 +47,24 @@ public class ArticleController : ControllerBase
 
         return NoContent();
     }
+    
+    
+    [HttpPut("{articleId}")]
+    public IActionResult UpdateArticle(int articleId, Article updatedArticle)
+    {
+        var success = _dataHandler.UpdateArticle(articleId, updatedArticle);
+        if (!success) return NotFound();
+
+        return NoContent();
+    }
+    
+    [HttpGet("search")]
+    public ActionResult<IEnumerable<Article>> Search(string query)
+    {
+        var result = _dataHandler
+            .GetArticles()
+            .Where(a => a.Title.Contains(query, StringComparison.OrdinalIgnoreCase));
+
+        return Ok(result);
+    }
 }

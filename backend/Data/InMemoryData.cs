@@ -6,6 +6,8 @@ public class InMemoryData : IDataHandler
 {
     private static int _articleIdCounter = 1;
     private readonly List<Article> _articles = new();
+    
+    
 
     public IEnumerable<Article> GetArticles() => _articles;
 
@@ -25,6 +27,17 @@ public class InMemoryData : IDataHandler
         if (article == null) return false;
 
         _articles.Remove(article);
+        return true;
+    }
+    
+    public bool UpdateArticle(int id, Article updated)
+    {
+        var article = GetArticleById(id);
+        if (article == null) return false;
+
+        article.Title = updated.Title;
+        article.Content = updated.Content;
+
         return true;
     }
 }
