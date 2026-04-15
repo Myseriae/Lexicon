@@ -1,9 +1,14 @@
+using Lexicon.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+// Register your IDataHandler service
+builder.Services.AddSingleton<IDataHandler, InMemoryData>();
+
+// OpenAPI / Swagger
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
