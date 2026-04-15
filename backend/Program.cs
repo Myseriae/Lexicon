@@ -6,7 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Register your IDataHandler service
-builder.Services.AddSingleton<IDataHandler, InMemoryData>();
 
 // OpenAPI / Swagger
 builder.Services.AddOpenApi();
