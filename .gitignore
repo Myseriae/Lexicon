@@ -14,6 +14,9 @@
 .idea
 **/.idea/
 
+[Oo]bj/
+
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
