@@ -38,3 +38,24 @@ export const deleteArticle = async (articleId) => {
         throw new Error('Failed to delete article');
     }
 };
+
+export const updateArticle = async (articleId, updatedArticle) => {
+    const response = await fetch(`${API_BASE_URL}/Article/${articleId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedArticle),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update article');
+    }
+};
+
+export const searchArticles = async (query) => {
+    const response = await fetch(`${API_BASE_URL}/Article/search?query=${encodeURIComponent(query)}`);
+    if (!response.ok) {
+        throw new Error('Failed to search articles');
+    }
+    return response.json();
+};
