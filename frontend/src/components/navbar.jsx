@@ -1,34 +1,48 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import CardNav from './CardNav/CardNav';
 
 const Navbar = () => {
+  const items = [
+    {
+      label: "Explore",
+      bgColor: "#1B1722",
+      textColor: "#fff",
+      links: [
+        { label: "Articles", ariaLabel: "View all articles", href: "/" },
+        { label: "Topics", ariaLabel: "Browse topics", href: "#" }
+      ]
+    },
+    {
+      label: "Create", 
+      bgColor: "#2F293A",
+      textColor: "#fff",
+      links: [
+        { label: "New Article", ariaLabel: "Create a new article", href: "/create" },
+        { label: "Guidelines", ariaLabel: "Writing guidelines", href: "#" }
+      ]
+    },
+    {
+      label: "Support",
+      bgColor: "#2F293A", 
+      textColor: "#fff",
+      links: [
+        { label: "Email", ariaLabel: "Email us", href: "#" },
+        { label: "About", ariaLabel: "About Lexicon", href: "#" }
+      ]
+    }
+  ];
+
   return (
-    <nav style={{ 
-      display: 'flex', 
-      justifyContent: 'space-between', 
-      alignItems: 'center', 
-      padding: '1rem', 
-      backgroundColor: '#f8f9fa', 
-      borderBottom: '1px solid #dee2e6' 
-    }}>
-      <Link to="/" style={{ 
-        fontSize: '1.5rem', 
-        fontWeight: 'bold', 
-        textDecoration: 'none', 
-        color: '#333' 
-      }}>
-        Lexicon
-      </Link>
-      <Link to="/create" style={{ 
-        padding: '0.5rem 1rem', 
-        backgroundColor: '#007bff', 
-        color: 'white', 
-        textDecoration: 'none', 
-        borderRadius: '4px' 
-      }}>
-        Create
-      </Link>
-    </nav>
+    <CardNav
+      logo="/logo.svg"
+      logoAlt="Lexicon Logo"
+      items={items}
+      baseColor="rgba(255, 255, 255, 0.1)"
+      menuColor="#fff"
+      buttonBgColor="#007bff"
+      buttonTextColor="#fff"
+      ease="power3.out"
+    />
   );
 };
 

@@ -38,31 +38,31 @@ const CreatePage = () => {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Create New Article</h1>
-      {error && <div style={{ color: 'red', marginBottom: '1rem' }}>Error: {error}</div>}
+    <div style={{ padding: '2rem', color: '#fff' }}>
+      <h1 style={{ color: '#fff' }}>Create New Article</h1>
+      {error && <div style={{ color: '#ff4d4d', marginBottom: '1rem' }}>Error: {error}</div>}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: '400px', gap: '1rem' }}>
         <div>
-          <label htmlFor="title">Title:</label>
+          <label htmlFor="title" style={{ display: 'block', marginBottom: '0.5rem' }}>Title:</label>
           <input
             type="text"
             id="title"
             name="title"
             value={formData.title}
             onChange={handleChange}
-            style={{ width: '100%', padding: '0.5rem' }}
+            style={{ width: '100%', padding: '0.5rem', backgroundColor: '#222', border: '1px solid #444', color: '#fff', borderRadius: '4px' }}
             required
             disabled={loading}
           />
         </div>
         <div>
-          <label htmlFor="content">Content:</label>
+          <label htmlFor="content" style={{ display: 'block', marginBottom: '0.5rem' }}>Content:</label>
           <textarea
             id="content"
             name="content"
             value={formData.content}
             onChange={handleChange}
-            style={{ width: '100%', padding: '0.5rem', minHeight: '100px' }}
+            style={{ width: '100%', padding: '0.5rem', minHeight: '100px', backgroundColor: '#222', border: '1px solid #444', color: '#fff', borderRadius: '4px' }}
             required
             disabled={loading}
           />
