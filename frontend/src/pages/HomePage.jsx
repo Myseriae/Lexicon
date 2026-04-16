@@ -38,7 +38,7 @@ const HomePage = () => {
 
     return (
         <div style={{ padding: '2rem', minHeight: '100vh', color: '#fff' }}>
-            <h1>Articles</h1>
+            <h1 style={{ textAlign: 'center' }}>Articles</h1>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
                 {articles.map(article => (
                     <SpotlightCard key={article.id} spotlightColor="rgba(0, 229, 255, 0.2)">
