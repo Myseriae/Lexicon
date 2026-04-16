@@ -6,7 +6,31 @@ public class InMemoryData : IDataHandler
 {
     private static int _articleIdCounter = 1;
     private readonly List<Article> _articles = new();
-    
+
+    public InMemoryData()
+    {
+        _articles.AddRange(new List<Article>
+        {
+            new Article
+            {
+                Id = _articleIdCounter++,
+                Title = "C#",
+                Content = "A modern programming language."
+            },
+            new Article
+            {
+                Id = _articleIdCounter++,
+                Title = "ASP.NET Core",
+                Content = "You use it to build a web application."
+            },
+            new Article
+            {
+                Id = _articleIdCounter++,
+                Title = "REST API",
+                Content = "Used to build RESTful APIs."
+            }
+        });
+    }
     
 
     public IEnumerable<Article> GetArticles() => _articles;
