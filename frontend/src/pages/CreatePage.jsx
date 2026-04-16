@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { createArticle } from '../api/api';
 
 const CreatePage = () => {
   const [formData, setFormData] = useState({
     title: '',
     content: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -14,15 +17,30 @@ const CreatePage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Add logic to save the article via API here if needed
+    setLoading(true);
+    setError(null);
+    try {
+      await createArticle(formData);
+      console.log('Form submitted successfully');
+      setFormData({
+        title: '',
+        content: ''
+      });
+      alert('Article created successfully!');
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Create New Article</h1>
+      {error && <div style={{ color: 'red', marginBottom: '1rem' }}>Error: {error}</div>}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: '400px', gap: '1rem' }}>
         <div>
           <label htmlFor="title">Title:</label>
@@ -34,6 +52,7 @@ const CreatePage = () => {
             onChange={handleChange}
             style={{ width: '100%', padding: '0.5rem' }}
             required
+            disabled={loading}
           />
         </div>
         <div>
@@ -45,17 +64,18 @@ const CreatePage = () => {
             onChange={handleChange}
             style={{ width: '100%', padding: '0.5rem', minHeight: '100px' }}
             required
+            disabled={loading}
           />
         </div>
-        <button type="submit" style={{ 
+        <button type="submit" disabled={loading} style={{ 
           padding: '0.5rem', 
-          backgroundColor: '#28a745', 
+          backgroundColor: loading ? '#6c757d' : '#28a745', 
           color: 'white', 
           border: 'none', 
           borderRadius: '4px', 
-          cursor: 'pointer' 
+          cursor: loading ? 'not-allowed' : 'pointer' 
         }}>
-          Submit
+          {loading ? 'Submitting...' : 'Submit'}
         </button>
       </form>
     </div>
