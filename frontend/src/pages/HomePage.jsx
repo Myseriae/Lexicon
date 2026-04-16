@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getArticles, deleteArticle } from '../api/api';
 import SpotlightCard from '../components/SpotlightCard/SpotlightCard';
 
@@ -6,6 +7,8 @@ const HomePage = () => {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchArticles = async () => {
@@ -39,29 +42,42 @@ const HomePage = () => {
     return (
         <div style={{ padding: '2rem', minHeight: '100vh', color: '#fff' }}>
             <h1 style={{ textAlign: 'center' }}>Articles</h1>
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
                 {articles.map(article => (
                     <SpotlightCard key={article.id} spotlightColor="rgba(0, 229, 255, 0.2)">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <h2 style={{ color: '#fff', marginBottom: '1rem' }}>{article.title}</h2>
-                            <button 
-                                onClick={() => handleDelete(article.id)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    padding: '5px',
-                                    borderRadius: '4px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}
-                                title="Delete article"
-                            >
-                                <img src="/trash.svg" alt="Delete" style={{ width: '50px', height: '50px', filter: 'invert(1)' }} />
-                            </button>
+                        
+                        <div 
+                            onClick={() => navigate(`/article/${article.id}`)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <h2 style={{ color: '#fff', marginBottom: '1rem' }}>{article.title}</h2>
+
+                                <button 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(article.id);
+                                    }}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        padding: '5px',
+                                        borderRadius: '4px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                    title="Delete article"
+                                >
+                                    <img src="/trash.svg" alt="Delete" style={{ width: '30px', height: '30px', filter: 'invert(1)' }} />
+                                </button>
+                            </div>
+
+                            <p style={{ color: '#ccc', lineHeight: '1.6' }}>{article.content}</p>
                         </div>
-                        <p style={{ color: '#ccc', lineHeight: '1.6' }}>{article.content}</p>
+
                     </SpotlightCard>
                 ))}
             </div>

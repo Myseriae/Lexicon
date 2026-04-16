@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage'
 import CreatePage from './pages/CreatePage'
 import Navbar from './components/navbar'
 import LightRays from './components/LightRays/LightRays'
+import ArticlePage from './pages/ArticlePage'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/create" element={<CreatePage />} />
+              <Route path="/article/:id" element={<ArticlePage />} />
             </Routes>
           </div>
         </div>
