@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createArticle } from '../api/api';
+import Modal from '../components/Modal/Modal';
 import './CreatePage.css';
 
 const CreatePage = () => {
@@ -9,6 +10,7 @@ const CreatePage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [modal, setModal] = useState({ isOpen: false, message: '', type: '' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,13 +31,17 @@ const CreatePage = () => {
         title: '',
         content: ''
       });
-      alert('Article created successfully!');
+      setModal({ isOpen: true, message: 'Article created successfully!', type: 'success' });
     } catch (err) {
       console.error('Error submitting form:', err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const closeModal = () => {
+    setModal({ isOpen: false, message: '', type: '' });
   };
 
   return (
@@ -72,6 +78,12 @@ const CreatePage = () => {
           {loading ? 'Submitting...' : 'Submit'}
         </button>
       </form>
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={closeModal}
+        message={modal.message}
+        type={modal.type}
+      />
     </div>
   );
 };

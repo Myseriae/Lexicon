@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getArticles, deleteArticle } from '../api/api';
 import SpotlightCard from '../components/SpotlightCard/SpotlightCard';
+import Modal from '../components/Modal/Modal';
 import './HomePage.css';
 
 const HomePage = () => {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [modal, setModal] = useState({ isOpen: false, message: '', type: '', onConfirm: null });
 
     const navigate = useNavigate();
 
@@ -27,14 +29,19 @@ const HomePage = () => {
     }, []);
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this article?')) return;
-
-        try {
-            await deleteArticle(id);
-            setArticles(articles.filter(article => article.id !== id));
-        } catch (err) {
-            alert('Failed to delete article: ' + err.message);
-        }
+        setModal({
+            isOpen: true,
+            message: 'Are you sure you want to delete this article?',
+            type: 'confirm',
+            onConfirm: async () => {
+                try {
+                    await deleteArticle(id);
+                    setArticles(articles.filter(article => article.id !== id));
+                } catch (err) {
+                    alert('Failed to delete article: ' + err.message);
+                }
+            }
+        });
     };
 
     if (loading) return <div className="loading">Loading...</div>;
@@ -73,6 +80,14 @@ const HomePage = () => {
                     </SpotlightCard>
                 ))}
             </div>
+
+            <Modal
+                isOpen={modal.isOpen}
+                onClose={() => setModal({ ...modal, isOpen: false })}
+                message={modal.message}
+                type={modal.type}
+                onConfirm={modal.onConfirm}
+            />
         </div>
     );
 };
