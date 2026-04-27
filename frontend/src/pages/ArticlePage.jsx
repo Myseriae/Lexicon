@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getArticle, updateArticle, deleteArticle } from '../api/api';
+import './ArticlePage.css';
 
 const ArticlePage = () => {
   const { id } = useParams();
@@ -31,19 +32,19 @@ const ArticlePage = () => {
     window.location.href = '/';
   };
 
-  if (!article) return <div style={{ color: '#fff' }}>Loading...</div>;
+  if (!article) return <div className="loading">Loading...</div>;
 
   return (
-    <div style={{ padding: '2rem', color: '#fff', maxWidth: '800px', margin: '0 auto' }}>
-      
+    <div className="article-container">
+
       {!editMode ? (
         <>
           <h1>{article.title}</h1>
-          <p style={{ color: '#ccc', marginTop: '1rem' }}>{article.content}</p>
+          <p className="article-content">{article.content}</p>
 
-          <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-            <button onClick={() => setEditMode(true)} style={btnStyle}>Edit</button>
-            <button onClick={handleDelete} style={deleteBtn}>Delete</button>
+          <div className="article-actions">
+            <button onClick={() => setEditMode(true)} className="btn">Edit</button>
+            <button onClick={handleDelete} className="btn btn-delete">Delete</button>
           </div>
         </>
       ) : (
@@ -51,17 +52,17 @@ const ArticlePage = () => {
           <input
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            style={inputStyle}
+            className="input"
           />
           <textarea
             value={formData.content}
             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-            style={textareaStyle}
+            className="textarea"
           />
 
-          <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-            <button onClick={handleUpdate} style={btnStyle}>Save</button>
-            <button onClick={() => setEditMode(false)} style={btnStyle}>Cancel</button>
+          <div className="article-actions">
+            <button onClick={handleUpdate} className="btn">Save</button>
+            <button onClick={() => setEditMode(false)} className="btn">Cancel</button>
           </div>
         </>
       )}
@@ -69,33 +70,5 @@ const ArticlePage = () => {
   );
 };
 
-const btnStyle = {
-  padding: '0.5rem 1rem',
-  backgroundColor: '#00cfff',
-  border: 'none',
-  color: '#000',
-  borderRadius: '5px',
-  cursor: 'pointer'
-};
-
-const deleteBtn = {
-  ...btnStyle,
-  backgroundColor: '#ff4d4d',
-  color: '#fff'
-};
-
-const inputStyle = {
-  width: '100%',
-  padding: '0.5rem',
-  marginBottom: '1rem',
-  backgroundColor: '#222',
-  border: '1px solid #444',
-  color: '#fff'
-};
-
-const textareaStyle = {
-  ...inputStyle,
-  minHeight: '150px'
-};
 
 export default ArticlePage;

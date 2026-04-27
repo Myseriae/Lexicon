@@ -1,4 +1,5 @@
 //import './App.css'
+import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import CreatePage from './pages/CreatePage'
@@ -9,8 +10,8 @@ import ArticlePage from './pages/ArticlePage'
 function App() {
   return (
     <Router>
-      <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden', backgroundColor: '#000' }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+      <div className="app-container">
+        <div className="app-background">
           <LightRays
             raysOrigin="top-center"
             raysColor="#00ffff"
@@ -23,9 +24,9 @@ function App() {
             distortion={0.05}
           />
         </div>
-        <div style={{ position: 'relative', zIndex: 10 }}>
+        <div className="app-content">
           <Navbar />
-          <div style={{ marginTop: '2rem' }}>
+          <div className="app-routes-container">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/create" element={<CreatePage />} />

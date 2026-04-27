@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getArticles, deleteArticle } from '../api/api';
 import SpotlightCard from '../components/SpotlightCard/SpotlightCard';
+import './HomePage.css';
 
 const HomePage = () => {
     const [articles, setArticles] = useState([]);
@@ -36,46 +37,37 @@ const HomePage = () => {
         }
     };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (loading) return <div className="loading">Loading...</div>;
+    if (error) return <div className="error">Error: {error}</div>;
 
     return (
-        <div style={{ padding: '2rem', minHeight: '100vh', color: '#fff' }}>
-            <h1 style={{ textAlign: 'center' }}>Articles</h1>
+        <div className="home-container">
+            <h1 className="home-title">Articles</h1>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
+            <div className="articles-grid">
                 {articles.map(article => (
                     <SpotlightCard key={article.id} spotlightColor="rgba(0, 229, 255, 0.2)">
                         
                         <div 
                             onClick={() => navigate(`/article/${article.id}`)}
-                            style={{ cursor: 'pointer' }}
+                            className="article-card"
                         >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <h2 style={{ color: '#fff', marginBottom: '1rem' }}>{article.title}</h2>
+                            <div className="article-card-header">
+                                <h2 className="article-card-title">{article.title}</h2>
 
                                 <button 
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleDelete(article.id);
                                     }}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        padding: '5px',
-                                        borderRadius: '4px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}
+                                    className="delete-btn"
                                     title="Delete article"
                                 >
-                                    <img src="/trash.svg" alt="Delete" style={{ width: '30px', height: '30px', filter: 'invert(1)' }} />
+                                    <img src="/trash.svg" alt="Delete" />
                                 </button>
                             </div>
 
-                            <p style={{ color: '#ccc', lineHeight: '1.6' }}>{article.content}</p>
+                            <p className="article-card-content">{article.content}</p>
                         </div>
 
                     </SpotlightCard>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createArticle } from '../api/api';
+import './CreatePage.css';
 
 const CreatePage = () => {
   const [formData, setFormData] = useState({
@@ -38,43 +39,36 @@ const CreatePage = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', color: '#fff' }}>
-      <h1 style={{ color: '#fff' }}>Create New Article</h1>
-      {error && <div style={{ color: '#ff4d4d', marginBottom: '1rem' }}>Error: {error}</div>}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: '400px', gap: '1rem' }}>
-        <div>
-          <label htmlFor="title" style={{ display: 'block', marginBottom: '0.5rem' }}>Title:</label>
+    <div className="create-container">
+      <h1 className="create-title">Create New Article</h1>
+      {error && <div className="create-error">Error: {error}</div>}
+      <form onSubmit={handleSubmit} className="create-form">
+        <div className="form-group">
+          <label htmlFor="title" className="form-label">Title:</label>
           <input
             type="text"
             id="title"
             name="title"
             value={formData.title}
             onChange={handleChange}
-            style={{ width: '100%', padding: '0.5rem', backgroundColor: '#222', border: '1px solid #444', color: '#fff', borderRadius: '4px' }}
+            className="form-input"
             required
             disabled={loading}
           />
         </div>
-        <div>
-          <label htmlFor="content" style={{ display: 'block', marginBottom: '0.5rem' }}>Content:</label>
+        <div className="form-group">
+          <label htmlFor="content" className="form-label">Content:</label>
           <textarea
             id="content"
             name="content"
             value={formData.content}
             onChange={handleChange}
-            style={{ width: '100%', padding: '0.5rem', minHeight: '100px', backgroundColor: '#222', border: '1px solid #444', color: '#fff', borderRadius: '4px' }}
+            className="form-textarea"
             required
             disabled={loading}
           />
         </div>
-        <button type="submit" disabled={loading} style={{ 
-          padding: '0.5rem', 
-          backgroundColor: loading ? '#6c757d' : '#28a745', 
-          color: 'white', 
-          border: 'none', 
-          borderRadius: '4px', 
-          cursor: loading ? 'not-allowed' : 'pointer' 
-        }}>
+        <button type="submit" disabled={loading} className="submit-btn">
           {loading ? 'Submitting...' : 'Submit'}
         </button>
       </form>

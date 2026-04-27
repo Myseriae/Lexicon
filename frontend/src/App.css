@@ -182,3 +182,29 @@
     border-right-color: var(--border);
   }
 }
+
+.app-container {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.app-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.app-content {
+  position: relative;
+  z-index: 10;
+}
+
+.app-routes-container {
+  margin-top: 2rem;
+}
+
