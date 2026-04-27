@@ -16,8 +16,8 @@ public class LexiconDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Article>()
-            .HasData(new Article { Id = 1, Title = "C#", Content = "A modern programming language." },
-                new Article { Id = 2, Title = "ASP.NET Core", Content = "You use it to build a web application." },
-                new Article { Id = 3, Title = "REST API", Content = "Used to build RESTful APIs." });
+            .HasData(new Article { Id = 1, Title = "C#", Content = "A modern programming language.", Created = new DateTime(2024, 1, 1) },
+                new Article { Id = 2, Title = "ASP.NET Core", Content = "You use it to build a web application.", Created = new DateTime(2024, 1, 1) },
+                new Article { Id = 3, Title = "REST API", Content = "Used to build RESTful APIs.", Created = new DateTime(2024, 1, 1) });
     }
 }

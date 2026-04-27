@@ -50,21 +50,21 @@ namespace Lexicon.Migrations
                         {
                             Id = 1,
                             Content = "A modern programming language.",
-                            Created = new DateTime(2026, 4, 27, 15, 43, 24, 467, DateTimeKind.Local).AddTicks(2560),
+                            Created = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "C#"
                         },
                         new
                         {
                             Id = 2,
                             Content = "You use it to build a web application.",
-                            Created = new DateTime(2026, 4, 27, 15, 43, 24, 480, DateTimeKind.Local).AddTicks(6620),
+                            Created = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "ASP.NET Core"
                         },
                         new
                         {
                             Id = 3,
                             Content = "Used to build RESTful APIs.",
-                            Created = new DateTime(2026, 4, 27, 15, 43, 24, 480, DateTimeKind.Local).AddTicks(6630),
+                            Created = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "REST API"
                         });
                 });
