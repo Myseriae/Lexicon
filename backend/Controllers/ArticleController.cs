@@ -1,5 +1,5 @@
-using Lexicon.Data;
 using Lexicon.Model;
+using Lexicon.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lexicon.Controllers;
@@ -8,21 +8,21 @@ namespace Lexicon.Controllers;
 [Route("[controller]")]
 public class ArticleController : ControllerBase
 {
-    private readonly IDataHandler _dataHandler;
+    private readonly IArticleService _articleService;
 
-    public ArticleController(IDataHandler dataHandler)
+    public ArticleController(IArticleService articleService)
     {
-        _dataHandler = dataHandler;
+        _articleService = articleService;
     }
 
     [HttpGet]
     public ActionResult<IEnumerable<Article>> GetArticles()
-        => Ok(_dataHandler.GetArticles());
+        => Ok(_articleService.GetArticles());
 
     [HttpGet("{articleId}")]
     public ActionResult<Article> GetArticle(int articleId)
     {
-        var article = _dataHandler.GetArticleById(articleId);
+        var article = _articleService.GetArticleById(articleId);
         if (article == null) return NotFound();
 
         return Ok(article);
@@ -31,7 +31,7 @@ public class ArticleController : ControllerBase
     [HttpPost]
     public ActionResult<Article> CreateArticle(Article article)
     {
-        var created = _dataHandler.AddArticle(article);
+        var created = _articleService.AddArticle(article);
 
         return CreatedAtAction(
             nameof(GetArticle),
@@ -42,29 +42,22 @@ public class ArticleController : ControllerBase
     [HttpDelete("{articleId}")]
     public IActionResult DeleteArticle(int articleId)
     {
-        var success = _dataHandler.DeleteArticle(articleId);
+        var success = _articleService.DeleteArticle(articleId);
         if (!success) return NotFound();
 
         return NoContent();
     }
-    
-    
+
     [HttpPut("{articleId}")]
     public IActionResult UpdateArticle(int articleId, Article updatedArticle)
     {
-        var success = _dataHandler.UpdateArticle(articleId, updatedArticle);
+        var success = _articleService.UpdateArticle(articleId, updatedArticle);
         if (!success) return NotFound();
 
         return NoContent();
     }
-    
+
     [HttpGet("search")]
     public ActionResult<IEnumerable<Article>> Search(string query)
-    {
-        var result = _dataHandler
-            .GetArticles()
-            .Where(a => a.Title.Contains(query, StringComparison.OrdinalIgnoreCase));
-
-        return Ok(result);
-    }
+        => Ok(_articleService.Search(query));
 }

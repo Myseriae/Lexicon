@@ -1,4 +1,5 @@
 using Lexicon.Data;
+using Lexicon.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,7 @@ builder.Services.AddControllers();
 
 // Register your IDataHandler service
 builder.Services.AddSingleton<IDataHandler, InMemoryData>();
+builder.Services.AddSingleton<IArticleService, ArticleService>();
 
 // OpenAPI / Swagger
 builder.Services.AddOpenApi();
