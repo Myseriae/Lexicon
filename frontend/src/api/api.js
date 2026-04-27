@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5149'; // Replace with your actual API base URL
+const API_BASE_URL = ''; // Replace with your actual API base URL
 
 export const getArticles = async () => {
     const response = await fetch(`${API_BASE_URL}/Article`);
