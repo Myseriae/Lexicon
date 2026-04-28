@@ -31,12 +31,42 @@ public class ArticleService : IArticleService
             }
         }
 
-        return _dataHandler.AddArticle(article);
+        try
+        {
+            return _dataHandler.AddArticle(article);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw;
+        }
     }
 
-    public bool DeleteArticle(int id) => _dataHandler.DeleteArticle(id);
+    public bool DeleteArticle(int id)
+    {
+        try
+        {
+            return _dataHandler.DeleteArticle(id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw;
+        }
+    }
 
-    public bool UpdateArticle(int id, Article article) => _dataHandler.UpdateArticle(id, article);
+    public bool UpdateArticle(int id, Article article)
+    {
+        try
+        {
+            return _dataHandler.UpdateArticle(id, article);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw;
+        }
+    }
 
     public IEnumerable<Article> Search(string query)
         => _dataHandler.GetArticles()
