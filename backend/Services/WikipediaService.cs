@@ -42,7 +42,7 @@ public class WikipediaService : IWikipediaService
         catch (Exception ex)
         {
             Console.WriteLine($"ERROR: {ex.Message}");
-            throw;
+            return null;
         }
     }
 
