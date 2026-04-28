@@ -6,17 +6,33 @@ namespace Lexicon.Services;
 public class ArticleService : IArticleService
 {
     private readonly IDataHandler _dataHandler;
+    private readonly IWikipediaService _wikipediaService;
 
-    public ArticleService(IDataHandler dataHandler)
+    public ArticleService(IDataHandler dataHandler, IWikipediaService wikipediaService)
     {
         _dataHandler = dataHandler;
+        _wikipediaService = wikipediaService;
     }
 
     public IEnumerable<Article> GetArticles() => _dataHandler.GetArticles();
 
     public Article? GetArticleById(int id) => _dataHandler.GetArticleById(id);
 
-    public Article AddArticle(Article article) => _dataHandler.AddArticle(article);
+    public async Task<Article> AddArticleAsync(Article article)
+    {
+        // Only fetch summary if none exists
+        if (string.IsNullOrWhiteSpace(article.Summary))
+        {
+            var summary = await _wikipediaService.GetSummaryAsync(article.Title);
+
+            if (!string.IsNullOrWhiteSpace(summary))
+            {
+                article.Summary = summary;
+            }
+        }
+
+        return _dataHandler.AddArticle(article);
+    }
 
     public bool DeleteArticle(int id) => _dataHandler.DeleteArticle(id);
 

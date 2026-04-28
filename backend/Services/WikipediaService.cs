@@ -16,24 +16,33 @@ public class WikipediaService : IWikipediaService
         var url =
             $"https://en.wikipedia.org/api/rest_v1/page/summary/{Uri.EscapeDataString(title)}";
 
+        Console.WriteLine($"Wikipedia URL: {url}");
+
         try
         {
             var response = await _httpClient.GetAsync(url);
+
+            Console.WriteLine($"Status code: {response.StatusCode}");
+
+            var body = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Response body: {body}");
 
             if (!response.IsSuccessStatusCode)
                 return null;
 
             var data = await response.Content.ReadFromJsonAsync<WikipediaResponse>();
 
-            // Ignore disambiguation pages
+            Console.WriteLine($"Extract: {data?.Extract}");
+
             if (data?.Type == "disambiguation")
                 return null;
 
             return data?.Extract;
         }
-        catch
+        catch (Exception ex)
         {
-            return null;
+            Console.WriteLine($"ERROR: {ex.Message}");
+            throw;
         }
     }
 

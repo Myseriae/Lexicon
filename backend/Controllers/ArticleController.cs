@@ -29,9 +29,9 @@ public class ArticleController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Article> CreateArticle(Article article)
+    public async Task<ActionResult<Article>> CreateArticle(Article article)
     {
-        var created = _articleService.AddArticle(article);
+        var created = await _articleService.AddArticleAsync(article);
 
         return CreatedAtAction(
             nameof(GetArticle),

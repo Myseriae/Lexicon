@@ -10,6 +10,11 @@ builder.Services.AddControllers();
 // Register your IDataHandler service
 builder.Services.AddScoped<IDataHandler, EFDataHandler>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
+builder.Services.AddHttpClient<IWikipediaService, WikipediaService>(client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd(
+        "LexiconApp/1.0 (educational project)");
+});
 
 // OpenAPI / Swagger
 builder.Services.AddOpenApi();
