@@ -6,6 +6,6 @@ public class Article
     public string Title { get; set; } = "";
     public string Content { get; set; } = "";
     public string? Summary { get; set; }
-    public DateTime Created { get; set; } = DateTime.Now;
+    public DateTime Created { get; set; } = DateTime.UtcNow;
     public List<Revision> Revisions { get; set; } = new List<Revision>();
 }
