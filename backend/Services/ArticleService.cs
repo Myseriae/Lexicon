@@ -38,7 +38,7 @@ public class ArticleService : IArticleService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return false;
+            throw;
         }
     }
 
