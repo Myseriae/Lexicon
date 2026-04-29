@@ -105,8 +105,7 @@ public class ArticleService : IArticleService
     }
 
     public IEnumerable<ArticleResponse> Search(string query)
-        => _dataHandler.GetArticlesAsync().GetAwaiter().GetResult()
-            .Where(a => a.Title.Contains(query, StringComparison.OrdinalIgnoreCase))
+        => _dataHandler.SearchArticlesAsync(query).GetAwaiter().GetResult()
             .Select(ToResponse);
 
     private static RevisionResponse ToRevisionResponse(Revision revision) => new RevisionResponse

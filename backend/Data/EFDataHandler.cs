@@ -64,4 +64,9 @@ public class EFDataHandler : IDataHandler
             .Where(r => r.ArticleId == articleId)
             .OrderBy(r => r.VersionNumber)
             .ToListAsync();
+
+    public async Task<IEnumerable<Article>> SearchArticlesAsync(string query) =>
+        await _context.Articles
+            .Where(a => a.Title.ToLower().Contains(query.ToLower()))
+            .ToListAsync();
 }

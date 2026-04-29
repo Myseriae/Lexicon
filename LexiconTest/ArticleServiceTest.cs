@@ -89,8 +89,8 @@ public class ArticleServiceTests
         };
 
         _dataHandlerMock
-            .Setup(d => d.GetArticlesAsync())
-            .ReturnsAsync(articles);
+            .Setup(d => d.SearchArticlesAsync("apple"))
+            .ReturnsAsync(articles.Where(a => a.Title.ToLower().Contains("apple")).ToList());
 
         var result = _service.Search("apple").ToList();
 
