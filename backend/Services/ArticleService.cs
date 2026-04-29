@@ -83,13 +83,11 @@ public class ArticleService : IArticleService
         var current = await _dataHandler.GetArticleByIdAsync(id);
         if (current == null) return false;
 
-        var summary = string.IsNullOrWhiteSpace(request.Summary) ? current.Summary : request.Summary;
-
         var article = new Article
         {
             Title = request.Title,
             Content = request.Content,
-            Summary = summary
+            Summary = request.Summary
         };
 
         try
