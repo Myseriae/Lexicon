@@ -38,7 +38,7 @@ public class ArticleService : IArticleService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            throw;
+            return false;
         }
     }
 
@@ -51,7 +51,7 @@ public class ArticleService : IArticleService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            throw;
+            return false;
         }
     }
 
@@ -64,7 +64,7 @@ public class ArticleService : IArticleService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            throw;
+            return false;
         }
     }
 
