@@ -11,4 +11,7 @@ public class UpdateArticleRequest
     [Required]
     [MaxLength(50000)]
     public string Content { get; set; } = "";
+
+    [MaxLength(1000)]
+    public string? Summary { get; set; }
 }
