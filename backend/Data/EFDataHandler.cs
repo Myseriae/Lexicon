@@ -40,6 +40,7 @@ public class EFDataHandler : IDataHandler
 
         existing.Title = article.Title;
         existing.Content = article.Content;
+        existing.Summary = article.Summary;
         await _context.SaveChangesAsync();
         return true;
     }

@@ -4,8 +4,8 @@ import './Modal.css';
 const Modal = ({ isOpen, onClose, message, type, onConfirm }) => {
   if (!isOpen) return null;
 
-  const handleConfirm = () => {
-    if (onConfirm) onConfirm();
+  const handleConfirm = async () => {
+    if (onConfirm) await onConfirm();
     onClose();
   };
 

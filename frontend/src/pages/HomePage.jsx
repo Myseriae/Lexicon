@@ -74,7 +74,11 @@ const HomePage = () => {
                                 </button>
                             </div>
 
-                            <p className="article-card-content">{article.content}</p>
+                            <p className="article-card-content">
+                                {article.summary?.length > 150 
+                                    ? `${article.summary.substring(0, 150)}...` 
+                                    : article.summary}
+                            </p>
                         </div>
 
                     </SpotlightCard>

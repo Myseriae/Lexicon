@@ -64,6 +64,16 @@
   resize: vertical;
 }
 
+.summary-textarea {
+  min-height: 80px;
+}
+
+.article-summary {
+  color: #00cfff;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
 .loading {
   color: #fff;
 }
