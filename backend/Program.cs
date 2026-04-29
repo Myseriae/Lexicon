@@ -26,8 +26,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:5173",
-                "http://localhost:80",
-                "http://localhost:5173")
+                "http://localhost:80")
             .AllowAnyHeader()
             .AllowAnyMethod();
         // Do NOT add AllowCredentials yet (keep it simple for now)
@@ -72,9 +71,11 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+else
+{
+    app.UseHttpsRedirection();
+}
 
-// ⚠️ IMPORTANT: CORS must be before auth + controllers
-app.UseHttpsRedirection();
 
 app.UseCors("FrontendDev");
 

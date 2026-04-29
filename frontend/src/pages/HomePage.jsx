@@ -36,7 +36,7 @@ const HomePage = () => {
             onConfirm: async () => {
                 try {
                     await deleteArticle(id);
-                    setArticles(articles.filter(article => article.id !== id));
+                    setArticles(prev => prev.filter(a => a.id !== id));
                 } catch (err) {
                     alert('Failed to delete article: ' + err.message);
                 }
