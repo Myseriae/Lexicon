@@ -2,6 +2,7 @@ using Lexicon.Data;
 using Lexicon.DTOs;
 using Lexicon.Model;
 using Lexicon.Services;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace LexiconTest;
@@ -11,6 +12,7 @@ public class ArticleServiceTests
 {
     private Mock<IDataHandler> _dataHandlerMock;
     private Mock<IWikipediaService> _wikipediaMock;
+    private Mock<ILogger<ArticleService>> _loggerMock;
     private ArticleService _service;
 
     [SetUp]
@@ -18,7 +20,8 @@ public class ArticleServiceTests
     {
         _dataHandlerMock = new Mock<IDataHandler>();
         _wikipediaMock = new Mock<IWikipediaService>();
-        _service = new ArticleService(_dataHandlerMock.Object, _wikipediaMock.Object);
+        _loggerMock = new Mock<ILogger<ArticleService>>();
+        _service = new ArticleService(_dataHandlerMock.Object, _wikipediaMock.Object, _loggerMock.Object);
     }
 
     [Test]
@@ -114,8 +117,8 @@ public class ArticleServiceTests
         var request = new UpdateArticleRequest { Title = "Test", Content = "Some content." };
 
         _dataHandlerMock
-            .Setup(d => d.UpdateArticleAsync(99, It.IsAny<Article>()))
-            .ReturnsAsync(false);
+            .Setup(d => d.GetArticleByIdAsync(99))
+            .ReturnsAsync((Article?)null);
 
         var result = await _service.UpdateArticleAsync(99, request);
 

@@ -1,6 +1,7 @@
 using Lexicon.Data;
 using Lexicon.DTOs;
 using Lexicon.Model;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Lexicon.Services;
@@ -9,11 +10,13 @@ public class ArticleService : IArticleService
 {
     private readonly IDataHandler _dataHandler;
     private readonly IWikipediaService _wikipediaService;
+    private readonly ILogger<ArticleService> _logger;
 
-    public ArticleService(IDataHandler dataHandler, IWikipediaService wikipediaService)
+    public ArticleService(IDataHandler dataHandler, IWikipediaService wikipediaService, ILogger<ArticleService> logger)
     {
         _dataHandler = dataHandler;
         _wikipediaService = wikipediaService;
+        _logger = logger;
     }
 
     private static ArticleResponse ToResponse(Article article) => new ArticleResponse
@@ -60,7 +63,7 @@ public class ArticleService : IArticleService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex, "Failed to add article");
             throw;
         }
     }
@@ -73,7 +76,7 @@ public class ArticleService : IArticleService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex, "Failed to delete article with ID {Id}", id);
             throw;
         }
     }
@@ -96,7 +99,7 @@ public class ArticleService : IArticleService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex, "Failed to update article with ID {Id}", id);
             throw;
         }
     }
