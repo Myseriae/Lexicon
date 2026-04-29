@@ -10,4 +10,5 @@ public interface IArticleService
     Task<bool> DeleteArticleAsync(int id);
     Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request);
     IEnumerable<ArticleResponse> Search(string query);
+    Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId);
 }

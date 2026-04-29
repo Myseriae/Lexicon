@@ -84,4 +84,8 @@ public class ArticleController : ControllerBase
     [HttpGet("search")]
     public ActionResult<IEnumerable<ArticleResponse>> Search(string query)
         => Ok(_articleService.Search(query));
+
+    [HttpGet("{articleId}/revisions}")]
+    public async Task<ActionResult<IEnumerable<RevisionResponse>>> GetRevisions(int articleId) =>
+        Ok(await _articleService.GetRevisionsAsync(articleId));
 }

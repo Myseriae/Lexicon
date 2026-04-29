@@ -8,5 +8,6 @@ public interface IDataHandler
         Task<Article?> GetArticleByIdAsync(int id);
         Task<Article> AddArticleAsync(Article article);
         Task<bool> DeleteArticleAsync(int id);
-        Task<bool> UpdateArticleAsync(int id, Article article);
+        Task<bool> UpdateArticleAsync(int id, Article article, string previousContent, string? summary = null);
+        Task<IEnumerable<Revision>> GetRevisionsAsync(int articleId);
 }

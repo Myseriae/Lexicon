@@ -33,10 +33,24 @@ public class EFDataHandler : IDataHandler
         return true;
     }
 
-    public async Task<bool> UpdateArticleAsync(int id, Article article)
+    public async Task<bool> UpdateArticleAsync(int id, Article article, string previousContent, string? summary = null)
     {
-        var existing = await GetArticleByIdAsync(id);
+        var existing = await _context.Articles.FindAsync(id);
         if (existing == null) return false;
+
+        var revisionCount = await _context.Revisions
+            .CountAsync(r => r.ArticleId == id);
+
+        var Revision = new Revision
+        {
+            ArticleId = id,
+            Content = previousContent,
+            Summary = summary,
+            VersionNumber = revisionCount + 1,
+            SavedAt = DateTime.UtcNow
+        };
+
+        _context.Revisions.Add(Revision);
 
         existing.Title = article.Title;
         existing.Content = article.Content;
@@ -44,4 +58,10 @@ public class EFDataHandler : IDataHandler
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<IEnumerable<Revision>> GetRevisionsAsync(int articleId) =>
+        await _context.Revisions
+            .Where(r => r.ArticleId == articleId)
+            .OrderBy(r => r.VersionNumber)
+            .ToListAsync();
 }

@@ -79,6 +79,9 @@ public class ArticleService : IArticleService
 
     public async Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request)
     {
+        var current = await _dataHandler.GetArticleByIdAsync(id);
+        if (current == null) return false;
+
         var article = new Article
         {
             Title = request.Title,
@@ -87,7 +90,7 @@ public class ArticleService : IArticleService
 
         try
         {
-            return await _dataHandler.UpdateArticleAsync(id, article);
+            return await _dataHandler.UpdateArticleAsync(id, article, current.Content, current.Summary);
         }
         catch (Exception ex)
         {
@@ -100,4 +103,19 @@ public class ArticleService : IArticleService
         => _dataHandler.GetArticlesAsync().GetAwaiter().GetResult()
             .Where(a => a.Title.Contains(query, StringComparison.OrdinalIgnoreCase))
             .Select(ToResponse);
+
+    private static RevisionResponse ToRevisionResponse(Revision revision) => new RevisionResponse
+    {
+        Id = revision.Id,
+        ArticleId = revision.ArticleId,
+        Content = revision.Content,
+        Summary = revision.Summary,
+        VersionNumber = revision.VersionNumber,
+        SavedAt = revision.SavedAt
+    };
+    public async Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId)
+    {
+        var revisions = await _dataHandler.GetRevisionsAsync(articleId);
+        return revisions.Select(ToRevisionResponse);
+    }
 }

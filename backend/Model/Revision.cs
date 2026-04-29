@@ -9,6 +9,7 @@ public class Revision
     [Required]
     [MaxLength(50000)]
     public string Content { get; set; } = "";
+    public string? Summary { get; set; }
     public DateTime SavedAt { get; set; } = DateTime.UtcNow;
     public int VersionNumber { get; set; }
     public int ArticleId { get; set; }
