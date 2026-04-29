@@ -37,7 +37,10 @@ public class WikipediaService : IWikipediaService
             if (data?.Type == "disambiguation")
                 return null;
 
-            return data?.Extract;
+            if (string.IsNullOrEmpty(data?.Extract))
+                return data?.Extract;
+
+            return $"{data.Extract}\nSummaries may not be correct as they are received from outside sources.";
         }
         catch (Exception ex)
         {

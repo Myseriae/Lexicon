@@ -74,10 +74,14 @@ const HomePage = () => {
                                 </button>
                             </div>
 
-                            <p className="article-card-content">
-                                {article.summary?.length > 150 
-                                    ? `${article.summary.substring(0, 150)}...` 
-                                    : article.summary}
+                            <p className={`article-card-content ${!article.summary ? 'no-summary' : ''}`}>
+                                {article.summary ? (
+                                    article.summary.length > 150 
+                                        ? `${article.summary.substring(0, 150)}...` 
+                                        : article.summary
+                                ) : (
+                                    "No summary was found for this article. Click to view details and create a summary."
+                                )}
                             </p>
                         </div>
 

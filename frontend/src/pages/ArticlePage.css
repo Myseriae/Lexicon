@@ -74,6 +74,10 @@
   margin-top: 1rem;
 }
 
+.article-summary.no-summary {
+  color: #666;
+}
+
 .loading {
   color: #fff;
 }

@@ -62,7 +62,7 @@ public class WikipediaServiceTests
 
         var result = await service.GetSummaryAsync("Cat");
 
-        Assert.That(result, Is.EqualTo("Cat is an animal"));
+        Assert.That(result, Is.EqualTo("Cat is an animal\nSummaries may not be correct as they are received from outside sources."));
     }
 
     private HttpClient CreateClient(HttpStatusCode statusCode, string content)

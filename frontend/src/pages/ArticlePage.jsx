@@ -74,7 +74,7 @@ const ArticlePage = () => {
       {article && !editMode ? (
         <>
           <h1>{article.title}</h1>
-          <p className="article-summary"><strong>Summary:</strong> {article.summary}</p>
+          <p className={`article-summary ${!article.summary ? 'no-summary' : ''}`}><strong>Summary:</strong> {article.summary || "Create a summary for this article."}</p>
           <p className="article-content">{article.content}</p>
 
           <div className="article-actions">
