@@ -38,7 +38,7 @@ const HomePage = () => {
                     await deleteArticle(id);
                     setArticles(prev => prev.filter(a => a.id !== id));
                 } catch (err) {
-                    alert('Failed to delete article: ' + err.message);
+                    setError(err.message);
                 }
             }
         });
