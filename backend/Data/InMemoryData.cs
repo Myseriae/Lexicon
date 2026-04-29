@@ -31,37 +31,38 @@ public class InMemoryData : IDataHandler
             }
         });
     }
-    
 
-    public IEnumerable<Article> GetArticles() => _articles;
 
-    public Article? GetArticleById(int id)
-        => _articles.FirstOrDefault(a => a.Id == id);
+    public Task<IEnumerable<Article>> GetArticlesAsync()
+        => Task.FromResult<IEnumerable<Article>>(_articles);
 
-    public Article AddArticle(Article article)
+    public Task<Article?> GetArticleByIdAsync(int id)
+        => Task.FromResult(_articles.FirstOrDefault(a => a.Id == id));
+
+    public Task<Article> AddArticleAsync(Article article)
     {
         article.Id = _articleIdCounter++;
         _articles.Add(article);
-        return article;
+        return Task.FromResult(article);
     }
 
-    public bool DeleteArticle(int id)
+    public Task<bool> DeleteArticleAsync(int id)
     {
-        var article = GetArticleById(id);
-        if (article == null) return false;
+        var article = _articles.FirstOrDefault(a => a.Id == id);
+        if (article == null) return Task.FromResult(false);
 
         _articles.Remove(article);
-        return true;
+        return Task.FromResult(true);
     }
-    
-    public bool UpdateArticle(int id, Article updated)
+
+    public Task<bool> UpdateArticleAsync(int id, Article updated)
     {
-        var article = GetArticleById(id);
-        if (article == null) return false;
+        var article = _articles.FirstOrDefault(a => a.Id == id);
+        if (article == null) return Task.FromResult(false);
 
         article.Title = updated.Title;
         article.Content = updated.Content;
 
-        return true;
+        return Task.FromResult(true);
     }
 }

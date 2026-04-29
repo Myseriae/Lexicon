@@ -4,10 +4,9 @@ namespace Lexicon.Data;
 
 public interface IDataHandler
 {
-        IEnumerable<Article> GetArticles();
-        Article? GetArticleById(int id);
-        Article AddArticle(Article article);
-        bool DeleteArticle(int id);
-        
-        bool UpdateArticle(int id, Article article);
+        Task<IEnumerable<Article>> GetArticlesAsync();
+        Task<Article?> GetArticleByIdAsync(int id);
+        Task<Article> AddArticleAsync(Article article);
+        Task<bool> DeleteArticleAsync(int id);
+        Task<bool> UpdateArticleAsync(int id, Article article);
 }

@@ -48,21 +48,37 @@ public class ArticleController : ControllerBase
     }
 
     [HttpDelete("{articleId}")]
-    public IActionResult DeleteArticle(int articleId)
+    public async Task<IActionResult> DeleteArticle(int articleId)
     {
-        var success = _articleService.DeleteArticle(articleId);
-        if (!success) return NotFound();
+        try
+        {
+            var success = await _articleService.DeleteArticleAsync(articleId);
+            if (!success) return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return StatusCode(500, "Failed to delete article.");
+        }
     }
 
     [HttpPut("{articleId}")]
-    public IActionResult UpdateArticle(int articleId, Article updatedArticle)
+    public async Task<IActionResult> UpdateArticle(int articleId, Article updatedArticle)
     {
-        var success = _articleService.UpdateArticle(articleId, updatedArticle);
-        if (!success) return NotFound();
+        try
+        {
+            var success = await _articleService.UpdateArticleAsync(articleId, updatedArticle);
+            if (!success) return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return StatusCode(500, "Failed to update article.");
+        }
     }
 
     [HttpGet("search")]

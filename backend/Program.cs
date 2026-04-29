@@ -44,24 +44,20 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<LexiconDbContext>();
-    var retries = 10;
+    var retries = 3;
     while (retries-- > 0)
     {
         try
         {
-            db.Database.Migrate();
+            await db.Database.MigrateAsync();
             Console.WriteLine("Migrations applied successfully.");
             break;
         }
         catch
         {
-            if (retries == 0)
-            {
-                Console.WriteLine("Failed to apply migrations, retrying...");
-                throw;
-            }
-            Console.WriteLine("Waiting 3 seconds to retry...");
-            Thread.Sleep(3000);
+            if (retries == 0) throw;
+            Console.WriteLine("Waiting for database, retrying...");
+            await Task.Delay(3000);
         }
     }
 }
@@ -83,4 +79,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

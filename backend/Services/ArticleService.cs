@@ -14,13 +14,12 @@ public class ArticleService : IArticleService
         _wikipediaService = wikipediaService;
     }
 
-    public IEnumerable<Article> GetArticles() => _dataHandler.GetArticles();
+    public IEnumerable<Article> GetArticles() => _dataHandler.GetArticlesAsync().GetAwaiter().GetResult();
 
-    public Article? GetArticleById(int id) => _dataHandler.GetArticleById(id);
+    public Article? GetArticleById(int id) => _dataHandler.GetArticleByIdAsync(id).GetAwaiter().GetResult();
 
     public async Task<Article> AddArticleAsync(Article article)
     {
-        // Only fetch summary if none exists
         if (string.IsNullOrWhiteSpace(article.Summary))
         {
             var summary = await _wikipediaService.GetSummaryAsync(article.Title);
@@ -33,7 +32,7 @@ public class ArticleService : IArticleService
 
         try
         {
-            return _dataHandler.AddArticle(article);
+            return await _dataHandler.AddArticleAsync(article);
         }
         catch (Exception ex)
         {
@@ -42,33 +41,33 @@ public class ArticleService : IArticleService
         }
     }
 
-    public bool DeleteArticle(int id)
+    public async Task<bool> DeleteArticleAsync(int id)
     {
         try
         {
-            return _dataHandler.DeleteArticle(id);
+            return await _dataHandler.DeleteArticleAsync(id);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return false;
+            throw;
         }
     }
 
-    public bool UpdateArticle(int id, Article article)
+    public async Task<bool> UpdateArticleAsync(int id, Article article)
     {
         try
         {
-            return _dataHandler.UpdateArticle(id, article);
+            return await _dataHandler.UpdateArticleAsync(id, article);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return false;
+            throw;
         }
     }
 
     public IEnumerable<Article> Search(string query)
-        => _dataHandler.GetArticles()
+        => _dataHandler.GetArticlesAsync().GetAwaiter().GetResult()
             .Where(a => a.Title.Contains(query, StringComparison.OrdinalIgnoreCase));
 }
