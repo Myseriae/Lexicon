@@ -1,4 +1,5 @@
-﻿using Lexicon.Data;
+using Lexicon.Data;
+using Lexicon.DTOs;
 using Lexicon.Model;
 using Lexicon.Services;
 using Moq;
@@ -23,41 +24,33 @@ public class ArticleServiceTests
     [Test]
     public async Task AddArticleAsync_CallsWikipedia_WhenSummaryIsMissing()
     {
-        var article = new Article
-        {
-            Title = "Cat",
-            Summary = ""
-        };
+        var request = new CreateArticleRequest { Title = "Cat", Content = "Info about cats.", Summary = "" };
 
         _wikipediaMock
             .Setup(w => w.GetSummaryAsync("Cat"))
             .ReturnsAsync("Cat summary");
 
         _dataHandlerMock
-            .Setup(d => d.AddArticle(It.IsAny<Article>()))
-            .Returns((Article a) => a);
+            .Setup(d => d.AddArticleAsync(It.IsAny<Article>()))
+            .ReturnsAsync((Article a) => a);
 
-        var result = await _service.AddArticleAsync(article);
+        var result = await _service.AddArticleAsync(request);
 
         Assert.That(result.Summary, Is.EqualTo("Cat summary"));
         _wikipediaMock.Verify(w => w.GetSummaryAsync("Cat"), Times.Once);
-        _dataHandlerMock.Verify(d => d.AddArticle(article), Times.Once);
+        _dataHandlerMock.Verify(d => d.AddArticleAsync(It.IsAny<Article>()), Times.Once);
     }
 
     [Test]
     public async Task AddArticleAsync_SkipsWikipedia_WhenSummaryExists()
     {
-        var article = new Article
-        {
-            Title = "Dog",
-            Summary = "Already exists"
-        };
+        var request = new CreateArticleRequest { Title = "Dog", Content = "Info about dogs.", Summary = "Already exists" };
 
         _dataHandlerMock
-            .Setup(d => d.AddArticle(It.IsAny<Article>()))
-            .Returns((Article a) => a);
+            .Setup(d => d.AddArticleAsync(It.IsAny<Article>()))
+            .ReturnsAsync((Article a) => a);
 
-        var result = await _service.AddArticleAsync(article);
+        var result = await _service.AddArticleAsync(request);
 
         Assert.That(result.Summary, Is.EqualTo("Already exists"));
         _wikipediaMock.Verify(w => w.GetSummaryAsync(It.IsAny<string>()), Times.Never);
@@ -66,24 +59,20 @@ public class ArticleServiceTests
     [Test]
     public async Task AddArticleAsync_SavesArticle_WhenWikipediaReturnsNull()
     {
-        var article = new Article
-        {
-            Title = "Unknown",
-            Summary = ""
-        };
+        var request = new CreateArticleRequest { Title = "Unknown", Content = "Some content.", Summary = "" };
 
         _wikipediaMock
             .Setup(w => w.GetSummaryAsync("Unknown"))
             .ReturnsAsync((string?)null);
 
         _dataHandlerMock
-            .Setup(d => d.AddArticle(It.IsAny<Article>()))
-            .Returns((Article a) => a);
+            .Setup(d => d.AddArticleAsync(It.IsAny<Article>()))
+            .ReturnsAsync((Article a) => a);
 
-        var result = await _service.AddArticleAsync(article);
+        var result = await _service.AddArticleAsync(request);
 
         Assert.That(result.Summary, Is.Null.Or.Empty);
-        _dataHandlerMock.Verify(d => d.AddArticle(article), Times.Once);
+        _dataHandlerMock.Verify(d => d.AddArticleAsync(It.IsAny<Article>()), Times.Once);
     }
 
     [Test]
@@ -97,8 +86,8 @@ public class ArticleServiceTests
         };
 
         _dataHandlerMock
-            .Setup(d => d.GetArticles())
-            .Returns(articles);
+            .Setup(d => d.GetArticlesAsync())
+            .ReturnsAsync(articles);
 
         var result = _service.Search("apple").ToList();
 
@@ -108,27 +97,27 @@ public class ArticleServiceTests
     }
 
     [Test]
-    public void DeleteArticle_ReturnsFalse_WhenNotFound()
+    public async Task DeleteArticleAsync_ReturnsFalse_WhenNotFound()
     {
         _dataHandlerMock
-            .Setup(d => d.DeleteArticle(99))
-            .Returns(false);
+            .Setup(d => d.DeleteArticleAsync(99))
+            .ReturnsAsync(false);
 
-        var result = _service.DeleteArticle(99);
+        var result = await _service.DeleteArticleAsync(99);
 
         Assert.That(result, Is.False);
     }
 
     [Test]
-    public void UpdateArticle_ReturnsFalse_WhenNotFound()
+    public async Task UpdateArticleAsync_ReturnsFalse_WhenNotFound()
     {
-        var article = new Article { Id = 99, Title = "Test" };
+        var request = new UpdateArticleRequest { Title = "Test", Content = "Some content." };
 
         _dataHandlerMock
-            .Setup(d => d.UpdateArticle(99, article))
-            .Returns(false);
+            .Setup(d => d.UpdateArticleAsync(99, It.IsAny<Article>()))
+            .ReturnsAsync(false);
 
-        var result = _service.UpdateArticle(99, article);
+        var result = await _service.UpdateArticleAsync(99, request);
 
         Assert.That(result, Is.False);
     }

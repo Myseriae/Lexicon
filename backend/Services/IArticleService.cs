@@ -1,13 +1,13 @@
-using Lexicon.Model;
+using Lexicon.DTOs;
 
 namespace Lexicon.Services;
 
 public interface IArticleService
 {
-    IEnumerable<Article> GetArticles();
-    Article? GetArticleById(int id);
-    Task<Article> AddArticleAsync(Article article);
+    IEnumerable<ArticleResponse> GetArticles();
+    ArticleResponse? GetArticleById(int id);
+    Task<ArticleResponse> AddArticleAsync(CreateArticleRequest request);
     Task<bool> DeleteArticleAsync(int id);
-    Task<bool> UpdateArticleAsync(int id, Article article);
-    IEnumerable<Article> Search(string query);
+    Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request);
+    IEnumerable<ArticleResponse> Search(string query);
 }

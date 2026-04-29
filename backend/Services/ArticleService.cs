@@ -1,4 +1,5 @@
 using Lexicon.Data;
+using Lexicon.DTOs;
 using Lexicon.Model;
 
 namespace Lexicon.Services;
@@ -14,12 +15,33 @@ public class ArticleService : IArticleService
         _wikipediaService = wikipediaService;
     }
 
-    public IEnumerable<Article> GetArticles() => _dataHandler.GetArticlesAsync().GetAwaiter().GetResult();
-
-    public Article? GetArticleById(int id) => _dataHandler.GetArticleByIdAsync(id).GetAwaiter().GetResult();
-
-    public async Task<Article> AddArticleAsync(Article article)
+    private static ArticleResponse ToResponse(Article article) => new ArticleResponse
     {
+        Id = article.Id,
+        Title = article.Title,
+        Content = article.Content,
+        Summary = article.Summary,
+        Created = article.Created
+    };
+
+    public IEnumerable<ArticleResponse> GetArticles()
+        => _dataHandler.GetArticlesAsync().GetAwaiter().GetResult().Select(ToResponse);
+
+    public ArticleResponse? GetArticleById(int id)
+    {
+        var article = _dataHandler.GetArticleByIdAsync(id).GetAwaiter().GetResult();
+        return article == null ? null : ToResponse(article);
+    }
+
+    public async Task<ArticleResponse> AddArticleAsync(CreateArticleRequest request)
+    {
+        var article = new Article
+        {
+            Title = request.Title,
+            Content = request.Content,
+            Summary = request.Summary
+        };
+
         if (string.IsNullOrWhiteSpace(article.Summary))
         {
             var summary = await _wikipediaService.GetSummaryAsync(article.Title);
@@ -32,7 +54,8 @@ public class ArticleService : IArticleService
 
         try
         {
-            return await _dataHandler.AddArticleAsync(article);
+            var saved = await _dataHandler.AddArticleAsync(article);
+            return ToResponse(saved);
         }
         catch (Exception ex)
         {
@@ -54,8 +77,14 @@ public class ArticleService : IArticleService
         }
     }
 
-    public async Task<bool> UpdateArticleAsync(int id, Article article)
+    public async Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request)
     {
+        var article = new Article
+        {
+            Title = request.Title,
+            Content = request.Content
+        };
+
         try
         {
             return await _dataHandler.UpdateArticleAsync(id, article);
@@ -67,7 +96,8 @@ public class ArticleService : IArticleService
         }
     }
 
-    public IEnumerable<Article> Search(string query)
+    public IEnumerable<ArticleResponse> Search(string query)
         => _dataHandler.GetArticlesAsync().GetAwaiter().GetResult()
-            .Where(a => a.Title.Contains(query, StringComparison.OrdinalIgnoreCase));
+            .Where(a => a.Title.Contains(query, StringComparison.OrdinalIgnoreCase))
+            .Select(ToResponse);
 }

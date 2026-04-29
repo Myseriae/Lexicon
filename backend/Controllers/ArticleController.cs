@@ -1,4 +1,4 @@
-using Lexicon.Model;
+using Lexicon.DTOs;
 using Lexicon.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,11 +16,11 @@ public class ArticleController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Article>> GetArticles()
+    public ActionResult<IEnumerable<ArticleResponse>> GetArticles()
         => Ok(_articleService.GetArticles());
 
     [HttpGet("{articleId}")]
-    public ActionResult<Article> GetArticle(int articleId)
+    public ActionResult<ArticleResponse> GetArticle(int articleId)
     {
         var article = _articleService.GetArticleById(articleId);
         if (article == null) return NotFound();
@@ -29,11 +29,11 @@ public class ArticleController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Article>> CreateArticle(Article article)
+    public async Task<ActionResult<ArticleResponse>> CreateArticle(CreateArticleRequest request)
     {
         try
         {
-            var created = await _articleService.AddArticleAsync(article);
+            var created = await _articleService.AddArticleAsync(request);
 
             return CreatedAtAction(
                 nameof(GetArticle),
@@ -65,11 +65,11 @@ public class ArticleController : ControllerBase
     }
 
     [HttpPut("{articleId}")]
-    public async Task<IActionResult> UpdateArticle(int articleId, Article updatedArticle)
+    public async Task<IActionResult> UpdateArticle(int articleId, UpdateArticleRequest request)
     {
         try
         {
-            var success = await _articleService.UpdateArticleAsync(articleId, updatedArticle);
+            var success = await _articleService.UpdateArticleAsync(articleId, request);
             if (!success) return NotFound();
 
             return NoContent();
@@ -82,6 +82,6 @@ public class ArticleController : ControllerBase
     }
 
     [HttpGet("search")]
-    public ActionResult<IEnumerable<Article>> Search(string query)
+    public ActionResult<IEnumerable<ArticleResponse>> Search(string query)
         => Ok(_articleService.Search(query));
 }
