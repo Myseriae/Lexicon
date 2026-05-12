@@ -4,6 +4,7 @@ using Lexicon.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lexicon.Migrations
 {
     [DbContext(typeof(LexiconDbContext))]
-    partial class LexiconDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260512083833_AddIdentityAndRefreshTokens")]
+    partial class AddIdentityAndRefreshTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,10 +32,6 @@ namespace Lexicon.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AuthorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -59,7 +58,6 @@ namespace Lexicon.Migrations
                         new
                         {
                             Id = 1,
-                            AuthorId = "",
                             Content = "A modern programming language.",
                             Created = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "C#"
@@ -67,7 +65,6 @@ namespace Lexicon.Migrations
                         new
                         {
                             Id = 2,
-                            AuthorId = "",
                             Content = "You use it to build a web application.",
                             Created = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "ASP.NET Core"
@@ -75,7 +72,6 @@ namespace Lexicon.Migrations
                         new
                         {
                             Id = 3,
-                            AuthorId = "",
                             Content = "Used to build RESTful APIs.",
                             Created = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "REST API"
