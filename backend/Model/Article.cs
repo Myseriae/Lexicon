@@ -5,6 +5,7 @@ namespace Lexicon.Model;
 public class Article
 {
     public int Id { get; set; }
+    public string AuthorId { get; set; } = "";
 
     [Required]
     [MaxLength(200)]
