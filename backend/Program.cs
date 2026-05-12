@@ -1,10 +1,10 @@
+using System.Text;
 using Lexicon.Data;
 using Lexicon.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Text;
 using Lexicon.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,49 +12,57 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Register your IDataHandler service
+// --- Application services ---
 builder.Services.AddScoped<IDataHandler, EFDataHandler>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<AuthSeeder>();
-builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddHttpClient<IWikipediaService, WikipediaService>(client =>
 {
-    client.DefaultRequestHeaders.UserAgent.ParseAdd(
-        "LexiconApp/1.0 (educational project)");
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("LexiconApp/1.0 (educational project)");
 });
 
-// OpenAPI / Swagger
+// --- Auth services ---
+// Scoped because UserManager (their dependency) is Scoped.
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<AuthSeeder>();
+
+// --- OpenAPI / Swagger ---
 builder.Services.AddOpenApi();
 
-// ✅ CORS (future-proof for JWT/cookies later)
+// --- CORS (credentials enabled for httpOnly refresh token cookie) ---
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendDev", policy =>
     {
         policy.WithOrigins(
-                "http://localhost:5173/",  // Vite dev server
-                "http://localhost:80")    // Docker nginx
+                "http://localhost:5173",
+                "http://localhost:80")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials();          // Required for httpOnly cookie to be sent cross-origin
+            .AllowCredentials();  // Required for the httpOnly cookie to work cross-origin
     });
 });
 
-// sql
+// --- Database ---
 builder.Services.AddDbContext<LexiconDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// --- JWT Authentication ---
 AddAuthentication();
+
+// --- ASP.NET Identity ---
 AddIdentity();
 
+// ===========================================================================
 var app = builder.Build();
+// ===========================================================================
 
-// Apply migrations on startup with retry logic
+// Apply migrations and seed roles on startup.
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<LexiconDbContext>();
+    var db      = scope.ServiceProvider.GetRequiredService<LexiconDbContext>();
+    var seeder  = scope.ServiceProvider.GetRequiredService<AuthSeeder>();
     var retries = 3;
     while (retries-- > 0)
     {
@@ -62,6 +70,7 @@ using (var scope = app.Services.CreateScope())
         {
             await db.Database.MigrateAsync();
             Console.WriteLine("Migrations applied successfully.");
+            await seeder.SeedRolesAsync();
             break;
         }
         catch
@@ -73,25 +82,23 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
-{
     app.MapOpenApi();
-}
 else
-{
     app.UseHttpsRedirection();
-}
-
 
 app.UseCors("FrontendDev");
 
-app.UseAuthentication();
+app.UseAuthentication();   // ← must come before UseAuthorization
 app.UseAuthorization();
 
 app.MapControllers();
 
 await app.RunAsync();
+
+// ---------------------------------------------------------------------------
+// Local functions for service registration
+// ---------------------------------------------------------------------------
 
 void AddAuthentication()
 {
@@ -102,8 +109,7 @@ void AddAuthentication()
     var issuerSigningKey = builder.Configuration["Jwt:IssuerSigningKey"]
                            ?? throw new InvalidOperationException(
                                "Jwt:IssuerSigningKey is missing. " +
-                               "Set it via: dotnet user-secrets set Jwt:IssuerSigningKey" + 
-                               "<secret>");
+                               "Set it via: dotnet user-secrets set \"Jwt:IssuerSigningKey\" \"<secret>\"");
 
     builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -125,3 +125,4 @@ wwwroot/uploads/
 
 # dotnet-tools local config (keep the manifest, not the binaries)
 .config/
+*.DotSettings.user
