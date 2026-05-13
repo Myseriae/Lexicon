@@ -14,4 +14,5 @@ public interface IArticleService
     Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId);
     Task<bool> AddCollaboratorAsync(int articleId, string userId);
     Task<bool> RemoveCollaboratorAsync(int articleId, string userId);
+    Task<bool> IsCollaboratorAsync(int articleId, string userId);
 }

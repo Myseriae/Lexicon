@@ -161,4 +161,17 @@ public class ArticleService : IArticleService
             throw;
         }
     }
+
+    public async Task<bool> IsCollaboratorAsync(int articleId, string userId)
+    {
+        try
+        {
+            return await _dataHandler.IsCollaboratorAsync(articleId, userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to check collaborator status");
+            throw;
+        }
+    }
 }

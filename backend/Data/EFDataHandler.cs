@@ -97,4 +97,8 @@ public class EFDataHandler : IDataHandler
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> IsCollaboratorAsync(int articleId, string userId) =>
+        await _context.ArticleCollaborators
+            .AnyAsync(ac => ac.ArticleId == articleId && ac.UserId == userId);
 }

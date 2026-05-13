@@ -46,6 +46,11 @@ public class ArticleController : ControllerBase
     public async Task<ActionResult<IEnumerable<CollaboratorResponse>>> GetCollaborators(int articleId)
         => Ok(await _articleService.GetCollaboratorsAsync(articleId));
 
+    [HttpGet("{articleId}/collaborators/{userId}/is-collaborator")]
+    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    public async Task<ActionResult<bool>> IsCollaborator(int articleId, string userId)
+        => Ok(await _articleService.IsCollaboratorAsync(articleId, userId));
+
     // -------------------------------------------------------------------------
     // Write endpoints — require authentication (Editor or Admin)
     // -------------------------------------------------------------------------
