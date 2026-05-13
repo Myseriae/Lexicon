@@ -20,14 +20,52 @@ public class LexiconDbContext : IdentityDbContext<IdentityUser, IdentityRole, st
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        var seedUser = new IdentityUser
+        {
+            Id = "seed-user",
+            UserName = "seeduser",
+            NormalizedUserName = "SEEDUSER",
+            Email = "seed@test.com",
+            NormalizedEmail = "SEED@TEST.COM",
+            EmailConfirmed = true,
+            SecurityStamp = "STATIC_SECURITY_STAMP",
+            ConcurrencyStamp = "STATIC_CONCURRENCY_STAMP",
+            PasswordHash = "AQAAAAIAAYagAAAAEL7yNihVlaTYLNGbmmYcPSdNZ9x5oCOZRC13du/DRVrQ+QGkJpqVdLFPBol4Bf8ZDg=="
+        };
+
+        modelBuilder.Entity<IdentityUser>().HasData(seedUser);
+
         modelBuilder.Entity<Article>()
             .HasOne<IdentityUser>()
             .WithMany()
             .HasForeignKey(a => a.AuthorId)
             .IsRequired();
-        modelBuilder.Entity<Article>()
-            .HasData(new Article { Id = 1, Title = "C#", Content = "A modern programming language.", Created = new DateTime(2024, 1, 1), AuthorId = "seed-user" },
-                new Article { Id = 2, Title = "ASP.NET Core", Content = "You use it to build a web application.", Created = new DateTime(2024, 1, 1), AuthorId = "seed-user" },
-                new Article { Id = 3, Title = "REST API", Content = "Used to build RESTful APIs.", Created = new DateTime(2024, 1, 1), AuthorId = "seed-user" });
+
+        modelBuilder.Entity<Article>().HasData(
+            new Article
+            {
+                Id = 1,
+                Title = "C#",
+                Content = "A modern programming language.",
+                Created = new DateTime(2024, 1, 1),
+                AuthorId = "seed-user"
+            },
+            new Article
+            {
+                Id = 2,
+                Title = "ASP.NET Core",
+                Content = "You use it to build a web application.",
+                Created = new DateTime(2024, 1, 1),
+                AuthorId = "seed-user"
+            },
+            new Article
+            {
+                Id = 3,
+                Title = "REST API",
+                Content = "Used to build RESTful APIs.",
+                Created = new DateTime(2024, 1, 1),
+                AuthorId = "seed-user"
+            });
     }
 }
