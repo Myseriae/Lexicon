@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import { getArticle, updateArticle, deleteArticle } from '../api/api';
+import { getCurrentUser } from '../utils/jwtUtils';
 import Modal from '../components/Modal/Modal';
 import './ArticlePage.css';
 
@@ -13,6 +14,8 @@ const ArticlePage = () => {
   const [modal, setModal] = useState({ isOpen: false, message: '', type: '', onConfirm: null });
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [canEdit, setCanEdit] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +32,24 @@ const ArticlePage = () => {
 
     fetchArticle();
   }, [id]);
+
+  // Get current user on component mount
+  useEffect(() => {
+    const user = getCurrentUser();
+    setCurrentUser(user);
+  }, []);
+
+  // Check permissions when article or user changes
+  useEffect(() => {
+    if (article && currentUser) {
+      const hasEditPermission =
+        currentUser.id === article.authorId ||
+        currentUser.role === 'Admin' ||
+        (article.collaboratorIds && article.collaboratorIds.includes(currentUser.id));
+
+      setCanEdit(hasEditPermission);
+    }
+  }, [article, currentUser]);
 
 
   const handleUpdate = async () => {
@@ -77,10 +98,20 @@ const ArticlePage = () => {
           <p className={`article-summary ${!article.summary ? 'no-summary' : ''}`}><strong>Summary:</strong> {article.summary || "Create a summary for this article."}</p>
           <p className="article-content">{article.content}</p>
 
-          <div className="article-actions">
-            <button onClick={() => setEditMode(true)} className="btn" disabled={saving}>Edit</button>
-            <button onClick={handleDelete} className="btn btn-delete" disabled={saving}>Delete</button>
-          </div>
+           <div className="article-actions">
+             {canEdit && (
+               <>
+                 <button onClick={() => setEditMode(true)} className="btn" disabled={saving}>Edit</button>
+                 <button onClick={handleDelete} className="btn btn-delete" disabled={saving}>Delete</button>
+               </>
+             )}
+             {!canEdit && currentUser && (
+               <p className="no-permission">You don't have permission to edit this article</p>
+             )}
+             {!currentUser && (
+               <p className="no-permission">Please log in to edit articles</p>
+             )}
+           </div>
         </>
       ) : article && (
         <>

@@ -23,13 +23,16 @@ public class ArticleController : ControllerBase
     // -------------------------------------------------------------------------
 
     [HttpGet]
-    public ActionResult<IEnumerable<ArticleResponse>> GetArticles()
-        => Ok(_articleService.GetArticles());
+    public async Task<ActionResult<IEnumerable<ArticleResponse>>> GetArticles()
+    {
+        var articles = await _articleService.GetArticlesAsync();
+        return Ok(articles);
+    }
 
     [HttpGet("{articleId}")]
-    public ActionResult<ArticleResponse> GetArticle(int articleId)
+    public async Task<ActionResult<ArticleResponse>> GetArticle(int articleId)
     {
-        var article = _articleService.GetArticleById(articleId);
+        var article = await _articleService.GetArticleByIdAsync(articleId);
         if (article == null) return NotFound();
         return Ok(article);
     }

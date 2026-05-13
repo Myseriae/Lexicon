@@ -6,6 +6,7 @@ import CreatePage from './pages/CreatePage'
 import Navbar from './components/Navbar.jsx'
 import LightRays from './components/LightRays/LightRays'
 import ArticlePage from './pages/ArticlePage'
+import LoginPage from "./pages/LoginPage.jsx";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/create" element={<CreatePage />} />
               <Route path="/article/:id" element={<ArticlePage />} />
+              <Route path="/login" element={<LoginPage />} />
             </Routes>
           </div>
         </div>

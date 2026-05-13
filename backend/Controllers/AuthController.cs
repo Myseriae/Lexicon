@@ -1,6 +1,8 @@
 ﻿using Lexicon.DTOs;
 using Lexicon.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Lexicon.Controllers;
 
@@ -24,9 +26,9 @@ public class AuthController : ControllerBase
     // -------------------------------------------------------------------------
 
     [HttpPost("register")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(AuthTokenResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Register([FromBody] RegisterRequest request)
+    public async Task<ActionResult<AuthTokenResponse>> Register([FromBody] RegisterRequest request)
     {
         var result = await _authService.RegisterAsync(
             request.Email, request.UserName, request.Password);
@@ -38,7 +40,13 @@ public class AuthController : ControllerBase
             return ValidationProblem();
         }
 
-        return Created();
+        SetRefreshTokenCookie(result.RefreshToken);
+
+        return Created("", new AuthTokenResponse(
+            result.AccessToken,
+            result.Email,
+            result.UserName,
+            result.Role));
     }
 
     // -------------------------------------------------------------------------
@@ -121,6 +129,33 @@ public class AuthController : ControllerBase
         });
 
         return NoContent();
+    }
+
+    // -------------------------------------------------------------------------
+    // GET /api/auth/verify
+    // Returns user info if token is valid
+    // -------------------------------------------------------------------------
+
+    [HttpGet("verify")]
+    [Authorize]
+    [ProducesResponseType(typeof(AuthTokenResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public ActionResult<AuthTokenResponse> Verify()
+    {
+        var email = User.FindFirst(ClaimTypes.Email)?.Value;
+        var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+        if (email == null || userName == null || role == null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(new AuthTokenResponse(
+            null, // Frontend already has the token
+            email,
+            userName,
+            role));
     }
 
     // -------------------------------------------------------------------------

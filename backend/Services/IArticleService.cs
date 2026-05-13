@@ -4,8 +4,8 @@ namespace Lexicon.Services;
 
 public interface IArticleService
 {
-    IEnumerable<ArticleResponse> GetArticles();
-    ArticleResponse? GetArticleById(int id);
+    Task<IEnumerable<ArticleResponse>> GetArticlesAsync();
+    Task<ArticleResponse?> GetArticleByIdAsync(int id);
     Task<ArticleResponse> AddArticleAsync(CreateArticleRequest request, string authorId);
     Task<bool> DeleteArticleAsync(int id, string userId, bool isAdmin);
     Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request, string userId, bool isAdmin);

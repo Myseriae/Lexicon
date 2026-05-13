@@ -103,10 +103,10 @@ public class ArticleServiceTests
     public async Task DeleteArticleAsync_ReturnsFalse_WhenNotFound()
     {
         _dataHandlerMock
-            .Setup(d => d.DeleteArticleAsync(99))
-            .ReturnsAsync(false);
+            .Setup(d => d.GetArticleByIdAsync(99))
+            .ReturnsAsync((Article?)null);
 
-        var result = await _service.DeleteArticleAsync(99);
+        var result = await _service.DeleteArticleAsync(99, "test-user", false);
 
         Assert.That(result, Is.False);
     }
@@ -120,7 +120,7 @@ public class ArticleServiceTests
             .Setup(d => d.GetArticleByIdAsync(99))
             .ReturnsAsync((Article?)null);
 
-        var result = await _service.UpdateArticleAsync(99, request);
+        var result = await _service.UpdateArticleAsync(99, request, "test-user", false);
 
         Assert.That(result, Is.False);
     }

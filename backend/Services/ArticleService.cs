@@ -21,19 +21,39 @@ public class ArticleService : IArticleService
     private static ArticleResponse ToResponse(Article article) => new ArticleResponse
     {
         Id = article.Id,
+        AuthorId = article.AuthorId,
         Title = article.Title,
         Content = article.Content,
         Summary = article.Summary,
         Created = article.Created
     };
 
-    public IEnumerable<ArticleResponse> GetArticles()
-        => _dataHandler.GetArticlesAsync().GetAwaiter().GetResult().Select(ToResponse);
-
-    public ArticleResponse? GetArticleById(int id)
+    private async Task<ArticleResponse> ToResponseWithCollaboratorsAsync(Article article)
     {
-        var article = _dataHandler.GetArticleByIdAsync(id).GetAwaiter().GetResult();
-        return article == null ? null : ToResponse(article);
+        var collaborators = await _dataHandler.GetCollaboratorsAsync(article.Id);
+        return new ArticleResponse
+        {
+            Id = article.Id,
+            AuthorId = article.AuthorId,
+            Title = article.Title,
+            Content = article.Content,
+            Summary = article.Summary,
+            Created = article.Created,
+            CollaboratorIds = collaborators.Select(c => c.UserId).ToList()
+        };
+    }
+
+    public async Task<IEnumerable<ArticleResponse>> GetArticlesAsync()
+    {
+        var articles = await _dataHandler.GetArticlesAsync();
+        return (articles ?? new List<Article>())
+            .Select(ToResponse);
+    }
+
+    public async Task<ArticleResponse?> GetArticleByIdAsync(int id)
+    {
+        var article = await _dataHandler.GetArticleByIdAsync(id);
+        return article == null ? null : await ToResponseWithCollaboratorsAsync(article);
     }
 
     public async Task<ArticleResponse> AddArticleAsync(CreateArticleRequest request, string authorId)

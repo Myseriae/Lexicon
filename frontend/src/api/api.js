@@ -1,12 +1,22 @@
+import { getToken } from '../utils/jwtUtils';
+
 const API_BASE_URL = '';
 
 const fetchWrapper = async (url, options = {}) => {
     try {
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        };
+
+        // Add authorization token if available
+        const token = getToken();
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch(`${API_BASE_URL}${url}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers,
-            },
+            headers,
             ...options,
         });
 
@@ -31,33 +41,33 @@ const fetchWrapper = async (url, options = {}) => {
 };
 
 export const getArticles = () => {
-    return fetchWrapper('/Article');
+    return fetchWrapper('/api/articles');
 };
 
 export const getArticle = (id) => {
-    return fetchWrapper(`/Article/${id}`);
+    return fetchWrapper(`/api/articles/${id}`);
 };
 
 export const createArticle = (article) => {
-    return fetchWrapper('/Article', {
+    return fetchWrapper('/api/articles', {
         method: 'POST',
         body: JSON.stringify(article),
     });
 };
 
 export const updateArticle = (id, article) => {
-    return fetchWrapper(`/Article/${id}`, {
+    return fetchWrapper(`/api/articles/${id}`, {
         method: 'PUT',
         body: JSON.stringify(article),
     });
 };
 
 export const deleteArticle = (id) => {
-    return fetchWrapper(`/Article/${id}`, {
+    return fetchWrapper(`/api/articles/${id}`, {
         method: 'DELETE',
     });
 };
 
 export const searchArticles = (query) => {
-    return fetchWrapper(`/Article/search?query=${encodeURIComponent(query)}`);
+    return fetchWrapper(`/api/articles/search?query=${encodeURIComponent(query)}`);
 };
