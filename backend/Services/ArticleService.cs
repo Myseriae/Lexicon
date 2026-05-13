@@ -2,7 +2,6 @@ using Lexicon.Data;
 using Lexicon.DTOs;
 using Lexicon.Model;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Lexicon.Services;
 
@@ -37,13 +36,14 @@ public class ArticleService : IArticleService
         return article == null ? null : ToResponse(article);
     }
 
-    public async Task<ArticleResponse> AddArticleAsync(CreateArticleRequest request)
+    public async Task<ArticleResponse> AddArticleAsync(CreateArticleRequest request, string authorId)
     {
         var article = new Article
         {
             Title = request.Title,
             Content = request.Content,
-            Summary = request.Summary
+            Summary = request.Summary,
+            AuthorId = authorId
         };
 
         if (string.IsNullOrWhiteSpace(article.Summary))

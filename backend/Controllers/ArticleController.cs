@@ -2,6 +2,7 @@ using Lexicon.DTOs;
 using Lexicon.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Lexicon.Controllers;
 
@@ -48,9 +49,15 @@ public class ArticleController : ControllerBase
     [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
     public async Task<ActionResult<ArticleResponse>> CreateArticle(CreateArticleRequest request)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
         try
         {
-            var created = await _articleService.AddArticleAsync(request);
+            var created = await _articleService.AddArticleAsync(request, userId);
             return CreatedAtAction(nameof(GetArticle), new { articleId = created.Id }, created);
         }
         catch (Exception ex)

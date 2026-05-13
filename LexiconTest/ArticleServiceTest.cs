@@ -37,7 +37,7 @@ public class ArticleServiceTests
             .Setup(d => d.AddArticleAsync(It.IsAny<Article>()))
             .ReturnsAsync((Article a) => a);
 
-        var result = await _service.AddArticleAsync(request);
+        var result = await _service.AddArticleAsync(request, "test-user");
 
         Assert.That(result.Summary, Is.EqualTo("Cat summary"));
         _wikipediaMock.Verify(w => w.GetSummaryAsync("Cat"), Times.Once);
@@ -53,7 +53,7 @@ public class ArticleServiceTests
             .Setup(d => d.AddArticleAsync(It.IsAny<Article>()))
             .ReturnsAsync((Article a) => a);
 
-        var result = await _service.AddArticleAsync(request);
+        var result = await _service.AddArticleAsync(request, "test-user");
 
         Assert.That(result.Summary, Is.EqualTo("Already exists"));
         _wikipediaMock.Verify(w => w.GetSummaryAsync(It.IsAny<string>()), Times.Never);
@@ -72,7 +72,7 @@ public class ArticleServiceTests
             .Setup(d => d.AddArticleAsync(It.IsAny<Article>()))
             .ReturnsAsync((Article a) => a);
 
-        var result = await _service.AddArticleAsync(request);
+        var result = await _service.AddArticleAsync(request, "test-user");
 
         Assert.That(result.Summary, Is.Null.Or.Empty);
         _dataHandlerMock.Verify(d => d.AddArticleAsync(It.IsAny<Article>()), Times.Once);
