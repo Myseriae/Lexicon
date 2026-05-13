@@ -68,8 +68,16 @@ public class ArticleService : IArticleService
         }
     }
 
-    public async Task<bool> DeleteArticleAsync(int id)
+    public async Task<bool> DeleteArticleAsync(int id, string userId, bool isAdmin)
     {
+        var article = await _dataHandler.GetArticleByIdAsync(id);
+        if (article == null) return false;
+
+        if (!await CanEditArticle(article, userId, isAdmin))
+        {
+            throw new UnauthorizedAccessException($"User {userId} does not have permission to delete article {id}");
+        }
+
         try
         {
             return await _dataHandler.DeleteArticleAsync(id);
@@ -81,10 +89,15 @@ public class ArticleService : IArticleService
         }
     }
 
-    public async Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request)
+    public async Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request, string userId, bool isAdmin)
     {
         var current = await _dataHandler.GetArticleByIdAsync(id);
         if (current == null) return false;
+
+        if (!await CanEditArticle(current, userId, isAdmin))
+        {
+            throw new UnauthorizedAccessException($"User {userId} does not have permission to update article {id}");
+        }
 
         var article = new Article
         {
@@ -173,5 +186,19 @@ public class ArticleService : IArticleService
             _logger.LogError(ex, "Failed to check collaborator status");
             throw;
         }
+    }
+
+    private async Task<bool> CanEditArticle(Article article, string userId, bool isAdmin)
+    {
+        // Admin can always edit
+        if (isAdmin) return true;
+
+        // Author can edit
+        if (article.AuthorId == userId) return true;
+
+        // Collaborator can edit
+        if (await _dataHandler.IsCollaboratorAsync(article.Id, userId)) return true;
+
+        return false;
     }
 }

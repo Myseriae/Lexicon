@@ -1,5 +1,6 @@
 using Lexicon.DTOs;
 using Lexicon.Services;
+using Lexicon.Services.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -42,12 +43,12 @@ public class ArticleController : ControllerBase
         => Ok(await _articleService.GetRevisionsAsync(articleId));
 
     [HttpGet("{articleId}/collaborators")]
-    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<ActionResult<IEnumerable<CollaboratorResponse>>> GetCollaborators(int articleId)
         => Ok(await _articleService.GetCollaboratorsAsync(articleId));
 
     [HttpGet("{articleId}/collaborators/{userId}/is-collaborator")]
-    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<ActionResult<bool>> IsCollaborator(int articleId, string userId)
         => Ok(await _articleService.IsCollaboratorAsync(articleId, userId));
 
@@ -56,7 +57,7 @@ public class ArticleController : ControllerBase
     // -------------------------------------------------------------------------
 
     [HttpPost]
-    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<ActionResult<ArticleResponse>> CreateArticle(CreateArticleRequest request)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -78,16 +79,26 @@ public class ArticleController : ControllerBase
     }
 
     [HttpPut("{articleId}")]
-    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<IActionResult> UpdateArticle(int articleId, UpdateArticleRequest request)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var isAdmin = User.IsInRole(Roles.Admin);
+
         try
         {
-            // Full authorization (owner vs admin check) will be added when the
-            // AuthorId service layer is wired up in the collaborators feature.
-            var success = await _articleService.UpdateArticleAsync(articleId, request);
+            var success = await _articleService.UpdateArticleAsync(articleId, request, userId, isAdmin);
             if (!success) return NotFound();
             return NoContent();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
         }
         catch (Exception ex)
         {
@@ -97,14 +108,26 @@ public class ArticleController : ControllerBase
     }
 
     [HttpDelete("{articleId}")]
-    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<IActionResult> DeleteArticle(int articleId)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var isAdmin = User.IsInRole(Roles.Admin);
+
         try
         {
-            var success = await _articleService.DeleteArticleAsync(articleId);
+            var success = await _articleService.DeleteArticleAsync(articleId, userId, isAdmin);
             if (!success) return NotFound();
             return NoContent();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
         }
         catch (Exception ex)
         {
@@ -114,7 +137,7 @@ public class ArticleController : ControllerBase
     }
 
     [HttpPost("{articleId}/collaborators/{userId}")]
-    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<IActionResult> AddCollaborator(int articleId, string userId)
     {
         try
@@ -131,7 +154,7 @@ public class ArticleController : ControllerBase
     }
 
     [HttpDelete("{articleId}/collaborators/{userId}")]
-    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<IActionResult> RemoveCollaborator(int articleId, string userId)
     {
         try

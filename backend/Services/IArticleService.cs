@@ -7,8 +7,8 @@ public interface IArticleService
     IEnumerable<ArticleResponse> GetArticles();
     ArticleResponse? GetArticleById(int id);
     Task<ArticleResponse> AddArticleAsync(CreateArticleRequest request, string authorId);
-    Task<bool> DeleteArticleAsync(int id);
-    Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request);
+    Task<bool> DeleteArticleAsync(int id, string userId, bool isAdmin);
+    Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request, string userId, bool isAdmin);
     IEnumerable<ArticleResponse> Search(string query);
     Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId);
     Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId);
