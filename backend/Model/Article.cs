@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace Lexicon.Model;
 
@@ -19,4 +20,5 @@ public class Article
     public string? Summary { get; set; }
     public DateTime Created { get; set; } = DateTime.UtcNow;
     public List<Revision> Revisions { get; set; } = new List<Revision>();
+    public List<ArticleCollaborator> Collaborators { get; set; } = new List<ArticleCollaborator>();
 }

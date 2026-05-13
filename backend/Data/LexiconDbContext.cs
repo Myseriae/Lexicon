@@ -14,6 +14,7 @@ public class LexiconDbContext : IdentityDbContext<IdentityUser, IdentityRole, st
     
     public DbSet<Article> Articles { get; set; }
     public DbSet<Revision> Revisions { get; set; }
+    public DbSet<ArticleCollaborator> ArticleCollaborators { get; set; }
     
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
@@ -67,5 +68,20 @@ public class LexiconDbContext : IdentityDbContext<IdentityUser, IdentityRole, st
                 Created = new DateTime(2024, 1, 1),
                 AuthorId = "seed-user"
             });
+
+        modelBuilder.Entity<ArticleCollaborator>()
+            .HasKey(ac => new { ac.ArticleId, ac.UserId });
+
+        modelBuilder.Entity<ArticleCollaborator>()
+            .HasOne(ac => ac.Article)
+            .WithMany(a => a.Collaborators)
+            .HasForeignKey(ac => ac.ArticleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ArticleCollaborator>()
+            .HasOne(ac => ac.User)
+            .WithMany()
+            .HasForeignKey(ac => ac.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

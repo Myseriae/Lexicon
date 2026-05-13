@@ -117,9 +117,48 @@ public class ArticleService : IArticleService
         VersionNumber = revision.VersionNumber,
         SavedAt = revision.SavedAt
     };
+
     public async Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId)
     {
         var revisions = await _dataHandler.GetRevisionsAsync(articleId);
         return revisions.Select(ToRevisionResponse);
+    }
+
+    private static CollaboratorResponse ToCollaboratorResponse(ArticleCollaborator collaborator) => new CollaboratorResponse
+    {
+        UserId = collaborator.UserId,
+        UserName = collaborator.User.UserName ?? ""
+    };
+
+    public async Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId)
+    {
+        var collaborators = await _dataHandler.GetCollaboratorsAsync(articleId);
+        return collaborators.Select(ToCollaboratorResponse);
+    }
+
+    public async Task<bool> AddCollaboratorAsync(int articleId, string userId)
+    {
+        try
+        {
+            return await _dataHandler.AddCollaboratorAsync(articleId, userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add collaborator");
+            throw;
+        }
+    }
+
+    public async Task<bool> RemoveCollaboratorAsync(int articleId, string userId)
+    {
+        try
+        {
+            return await _dataHandler.RemoveCollaboratorAsync(articleId, userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to remove collaborator");
+            throw;
+        }
     }
 }

@@ -69,4 +69,32 @@ public class EFDataHandler : IDataHandler
         await _context.Articles
             .Where(a => a.Title.ToLower().Contains(query.ToLower()))
             .ToListAsync();
+
+    public async Task<IEnumerable<ArticleCollaborator>> GetCollaboratorsAsync(int articleId) =>
+        await _context.ArticleCollaborators
+            .Where(ac => ac.ArticleId == articleId)
+            .Include(ac => ac.User)
+            .ToListAsync();
+
+    public async Task<bool> AddCollaboratorAsync(int articleId, string userId)
+    {
+        if (await _context.ArticleCollaborators.AnyAsync(ac => ac.ArticleId == articleId && ac.UserId == userId))
+            return false; // Already a collaborator
+
+        var collaborator = new ArticleCollaborator { ArticleId = articleId, UserId = userId };
+        _context.ArticleCollaborators.Add(collaborator);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> RemoveCollaboratorAsync(int articleId, string userId)
+    {
+        var collaborator = await _context.ArticleCollaborators
+            .FirstOrDefaultAsync(ac => ac.ArticleId == articleId && ac.UserId == userId);
+        if (collaborator == null) return false;
+
+        _context.ArticleCollaborators.Remove(collaborator);
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

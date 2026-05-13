@@ -41,6 +41,11 @@ public class ArticleController : ControllerBase
     public async Task<ActionResult<IEnumerable<RevisionResponse>>> GetRevisions(int articleId)
         => Ok(await _articleService.GetRevisionsAsync(articleId));
 
+    [HttpGet("{articleId}/collaborators")]
+    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    public async Task<ActionResult<IEnumerable<CollaboratorResponse>>> GetCollaborators(int articleId)
+        => Ok(await _articleService.GetCollaboratorsAsync(articleId));
+
     // -------------------------------------------------------------------------
     // Write endpoints — require authentication (Editor or Admin)
     // -------------------------------------------------------------------------
@@ -100,6 +105,40 @@ public class ArticleController : ControllerBase
         {
             Console.WriteLine(ex.Message);
             return StatusCode(500, "Failed to delete article.");
+        }
+    }
+
+    [HttpPost("{articleId}/collaborators/{userId}")]
+    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    public async Task<IActionResult> AddCollaborator(int articleId, string userId)
+    {
+        try
+        {
+            var success = await _articleService.AddCollaboratorAsync(articleId, userId);
+            if (!success) return BadRequest("User is already a collaborator or invalid user.");
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return StatusCode(500, "Failed to add collaborator.");
+        }
+    }
+
+    [HttpDelete("{articleId}/collaborators/{userId}")]
+    [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
+    public async Task<IActionResult> RemoveCollaborator(int articleId, string userId)
+    {
+        try
+        {
+            var success = await _articleService.RemoveCollaboratorAsync(articleId, userId);
+            if (!success) return NotFound("Collaborator not found.");
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return StatusCode(500, "Failed to remove collaborator.");
         }
     }
 }

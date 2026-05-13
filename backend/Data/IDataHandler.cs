@@ -11,4 +11,7 @@ public interface IDataHandler
         Task<bool> UpdateArticleAsync(int id, Article article, string previousContent, string? summary = null);
         Task<IEnumerable<Article>> SearchArticlesAsync(string query);
         Task<IEnumerable<Revision>> GetRevisionsAsync(int articleId);
+        Task<IEnumerable<ArticleCollaborator>> GetCollaboratorsAsync(int articleId);
+        Task<bool> AddCollaboratorAsync(int articleId, string userId);
+        Task<bool> RemoveCollaboratorAsync(int articleId, string userId);
 }
