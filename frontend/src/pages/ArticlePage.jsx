@@ -7,7 +7,6 @@ import Collaborators from '../components/Collaborators/Collaborators';
 import MDEditor from '@uiw/react-md-editor';
 import ReactMarkdown from 'react-markdown';
 import '@uiw/react-md-editor/markdown-editor.css';
-import '@uiw/react-md-editor/markdown.css';
 import './ArticlePage.css';
 
 const ArticlePage = () => {
@@ -169,6 +168,7 @@ const ArticlePage = () => {
             value={formData.content}
             onChange={(value) => setFormData({ ...formData, content: value || '' })}
             className="textarea"
+            data-color-mode="dark"
           />
 
           <div className="article-actions">

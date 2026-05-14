@@ -3,7 +3,6 @@ import { createArticle } from '../api/api';
 import Modal from '../components/Modal/Modal';
 import MDEditor from '@uiw/react-md-editor';
 import '@uiw/react-md-editor/markdown-editor.css';
-import '@uiw/react-md-editor/markdown.css';
 import './CreatePage.css';
 
 const CreatePage = () => {
@@ -76,6 +75,8 @@ const CreatePage = () => {
               setFormData(prev => ({ ...prev, content: value || '' }));
             }}
             className="form-textarea"
+            height={480}
+            data-color-mode="dark"
           />
         </div>
         <button type="submit" disabled={loading} className="submit-btn">

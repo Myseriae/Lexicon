@@ -1,6 +1,8 @@
 .create-container {
-  padding: 2rem;
+  padding: 2rem 3rem;
   color: #fff;
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 .create-title {
@@ -15,8 +17,7 @@
 .create-form {
   display: flex;
   flex-direction: column;
-  max-width: 400px;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .form-group {
@@ -61,13 +62,15 @@
 }
 
 .submit-btn {
-  padding: 0.5rem;
+  padding: 0.6rem 2.5rem;
   background-color: #28a745;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
+  font-size: 1rem;
+  align-self: flex-start;
   transition: background-color 0.2s;
 }
 
@@ -78,5 +81,143 @@
 .submit-btn:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
+}
+
+/* MDEditor dark theme overrides */
+.form-textarea.w-md-editor {
+  background-color: #222;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  padding: 0;
+  min-height: 480px;
+  /* Supply dark-mode prettylights token variables directly on the editor root so
+     the Prism token color rules inside .w-md-editor-text-pre resolve to visible
+     light colors instead of the near-black light-mode fallbacks. */
+  --color-fg-default: #ccc;
+  --color-canvas-default: #222;
+  --color-border-default: #444;
+  --color-prettylights-syntax-comment: #8b949e;
+  --color-prettylights-syntax-constant: #79c0ff;
+  --color-prettylights-syntax-entity: #d2a8ff;
+  --color-prettylights-syntax-storage-modifier-import: #c9d1d9;
+  --color-prettylights-syntax-entity-tag: #7ee787;
+  --color-prettylights-syntax-keyword: #ff7b72;
+  --color-prettylights-syntax-string: #a5d6ff;
+  --color-prettylights-syntax-variable: #ffa657;
+  --color-prettylights-syntax-markup-bold: #c9d1d9;
+  --color-prettylights-syntax-markup-italic: #c9d1d9;
+  --color-prettylights-syntax-markup-heading: #1f6feb;
+  --color-prettylights-syntax-markup-list: #f2cc60;
+  --color-prettylights-syntax-markup-deleted-text: #ffdcd7;
+  --color-prettylights-syntax-markup-inserted-text: #aff5b4;
+  --color-prettylights-syntax-markup-changed-text: #ffdfb6;
+  --color-prettylights-syntax-meta-diff-range: #d2a8ff;
+  --color-prettylights-syntax-constant-other-reference-link: #a5d6ff;
+}
+
+.form-textarea.w-md-editor:focus-within {
+  border-color: #00cfff;
+  box-shadow: 0 0 5px rgba(0, 207, 255, 0.3);
+}
+
+.form-textarea .w-md-editor-toolbar {
+  background-color: #111;
+  border-bottom: 1px solid #444;
+}
+
+.form-textarea .w-md-editor-toolbar ul li button {
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.form-textarea .w-md-editor-toolbar ul li button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.form-textarea .w-md-editor-toolbar ul li button:hover {
+  color: #00cfff;
+  background-color: #222;
+}
+
+.form-textarea .w-md-editor-text-pre,
+.form-textarea .w-md-editor-text-input,
+.form-textarea .w-md-editor-text {
+  color: #ccc;
+  font-family: inherit;
+}
+
+
+.form-textarea .w-md-editor-preview {
+  background-color: #222;
+  color: #fff;
+}
+
+.form-textarea .wmde-markdown {
+  background-color: #222;
+  color: #fff;
+}
+
+.form-textarea .wmde-markdown h1,
+.form-textarea .wmde-markdown h2,
+.form-textarea .wmde-markdown h3,
+.form-textarea .wmde-markdown h4,
+.form-textarea .wmde-markdown h5,
+.form-textarea .wmde-markdown h6 {
+  color: #fff;
+  border-bottom-color: #444;
+}
+
+.form-textarea .wmde-markdown a {
+  color: #00cfff;
+}
+
+.form-textarea .wmde-markdown code,
+.form-textarea .wmde-markdown pre {
+  background-color: #111;
+  color: #00cfff;
+}
+
+.form-textarea .wmde-markdown blockquote {
+  border-left-color: #444;
+  color: #aaa;
+}
+
+.form-textarea .wmde-markdown hr {
+  border-color: #444;
+}
+
+@media (max-width: 640px) {
+  .create-container {
+    padding: 1rem;
+  }
+
+  .form-textarea.w-md-editor {
+    min-height: 360px;
+  }
+
+  /* Toolbar scrolls horizontally instead of wrapping */
+  .form-textarea .w-md-editor-toolbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .form-textarea .w-md-editor-toolbar ul {
+    flex-wrap: nowrap;
+  }
+
+  /* On narrow screens hide the preview pane and go full-width edit */
+  .form-textarea .w-md-editor-preview {
+    display: none;
+  }
+
+  .form-textarea .w-md-editor-input {
+    width: 100% !important;
+    border-right: none;
+  }
 }
 
