@@ -77,3 +77,72 @@
 .error {
   color: #ff4d4d;
 }
+
+
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.tag-chip {
+  background: rgba(0, 207, 255, 0.15);
+  color: #00cfff;
+  border: 1px solid rgba(0, 207, 255, 0.4);
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.tag-chip:hover {
+  background: #00cfff;
+  color: #000;
+}
+
+.active-filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  color: #00cfff;
+}
+
+.active-filter button {
+  background: transparent;
+  border: 1px solid #00cfff;
+  color: #00cfff;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+}
+
+.active-filter button:hover {
+  background: #00cfff;
+  color: #000;
+}
+
+.article-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tag-chip {
+  background-color: rgba(0, 207, 255, 0.15);
+  color: #00cfff;
+  border: 1px solid rgba(0, 207, 255, 0.3);
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag-chip:hover {
+  background-color: rgba(0, 207, 255, 0.3);
+}

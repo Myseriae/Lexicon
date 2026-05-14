@@ -263,3 +263,21 @@
     border-right: none;
   }
 }
+
+
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.tag-chip {
+  background: rgba(0, 207, 255, 0.15);
+  color: #00cfff;
+  border: 1px solid rgba(0, 207, 255, 0.4);
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.85rem;
+}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getArticle, updateArticle, deleteArticle, getCollaborators } from '../api/api';
 import { getCurrentUser } from '../utils/jwtUtils';
 import Modal from '../components/Modal/Modal';
@@ -113,40 +113,47 @@ const ArticlePage = () => {
   return (
     <div className="article-container">
       {error && <div className="error">Error: {error}</div>}
-      
+
       {article && !editMode ? (
         <>
           <h1>{article.title}</h1>
           <p className="article-author">Created by {article.authorUsername}</p>
+          <div className="tag-list">
+            {article.tags?.map(tag => (
+              <span key={tag.id} className="tag-chip">
+                {tag.name}
+              </span>
+            ))}
+          </div>
           <p className={`article-summary ${!article.summary ? 'no-summary' : ''}`}><strong>Summary:</strong> {article.summary || "Create a summary for this article."}</p>
           <div className="article-content"><ReactMarkdown>{article.content}</ReactMarkdown></div>
 
-           <div className="article-actions">
-              {canEdit && (
-                <>
-                  <button onClick={() => setEditMode(true)} className="btn" disabled={saving}>Edit</button>
-                  <button onClick={handleDelete} className="btn btn-delete" disabled={saving}>Delete</button>
-                </>
-              )}
-              {!canEdit && currentUser && (
-                <p className="no-permission">You don't have permission to edit this article</p>
-              )}
-              {!currentUser && (
-                <p className="no-permission">Please log in to edit articles</p>
-              )}
-            </div>
-
-            {/* Show collaborators section to author and collaborators */}
-            {article && currentUser && (canEdit) && (
-              <Collaborators
-                articleId={article.id}
-                collaborators={collaborators}
-                authorId={article.authorId}
-                isAuthor={currentUser.id === article.authorId}
-                onCollaboratorAdded={fetchCollaborators}
-                onCollaboratorRemoved={fetchCollaborators}
-              />
+          <div className="article-actions">
+            {canEdit && (
+              <>
+                <button onClick={() => setEditMode(true)} className="btn" disabled={saving}>Edit</button>
+                <button onClick={handleDelete} className="btn btn-delete" disabled={saving}>Delete</button>
+              </>
             )}
+            {!canEdit && currentUser && (
+              <p className="no-permission">You don't have permission to edit this article</p>
+            )}
+            {!currentUser && (
+              <p className="no-permission">Please log in to edit articles</p>
+            )}
+          </div>
+
+          {/* Show collaborators section to author and collaborators */}
+          {article && currentUser && (canEdit) && (
+            <Collaborators
+              articleId={article.id}
+              collaborators={collaborators}
+              authorId={article.authorId}
+              isAuthor={currentUser.id === article.authorId}
+              onCollaboratorAdded={fetchCollaborators}
+              onCollaboratorRemoved={fetchCollaborators}
+            />
+          )}
         </>
       ) : article && (
         <>
@@ -182,7 +189,7 @@ const ArticlePage = () => {
 
       {modal.isOpen && (
         <Modal
-            isOpen={modal.isOpen}
+          isOpen={modal.isOpen}
           message={modal.message}
           type={modal.type}
           onConfirm={modal.onConfirm}

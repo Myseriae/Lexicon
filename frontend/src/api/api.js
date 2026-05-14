@@ -40,8 +40,12 @@ const fetchWrapper = async (url, options = {}) => {
     }
 };
 
-export const getArticles = () => {
-    return fetchWrapper('/api/articles');
+export const getArticles = (tag) => {
+    const url = tag
+        ? `/api/articles?tag=${encodeURIComponent(tag)}`
+        : '/api/articles';
+
+    return fetchWrapper(url);
 };
 
 export const getArticle = (id) => {
@@ -100,4 +104,22 @@ export const removeCollaborator = (articleId, userId) => {
 
 export const isCollaborator = (articleId, userId) => {
     return fetchWrapper(`/api/articles/${articleId}/collaborators/${userId}/is-collaborator`);
+};
+
+// tag endpoints
+export const getTags = () => {
+    return fetchWrapper('/api/tags');
+};
+
+export const addTagToArticle = (articleId, name) => {
+    return fetchWrapper(`/api/articles/${articleId}/tags`, {
+        method: 'POST',
+        body: JSON.stringify({ name }),
+    });
+};
+
+export const removeTagFromArticle = (articleId, tagId) => {
+    return fetchWrapper(`/api/articles/${articleId}/tags/${tagId}`, {
+        method: 'DELETE',
+    });
 };

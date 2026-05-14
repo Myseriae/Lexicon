@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getArticles, deleteArticle } from '../api/api';
 import SpotlightCard from '../components/SpotlightCard/SpotlightCard';
 import Modal from '../components/Modal/Modal';
@@ -9,14 +9,25 @@ const HomePage = () => {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [modal, setModal] = useState({ isOpen: false, message: '', type: '', onConfirm: null });
+    const [modal, setModal] = useState({
+        isOpen: false,
+        message: '',
+        type: '',
+        onConfirm: null
+    });
 
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    const tag = searchParams.get('tag');
 
     useEffect(() => {
         const fetchArticles = async () => {
             try {
-                const data = await getArticles();
+                setLoading(true);
+
+                const data = await getArticles(tag);
+
                 setArticles(data);
             } catch (err) {
                 setError(err.message);
@@ -26,7 +37,7 @@ const HomePage = () => {
         };
 
         fetchArticles();
-    }, []);
+    }, [tag]);
 
     const handleDelete = async (id) => {
         setModal({
@@ -36,7 +47,10 @@ const HomePage = () => {
             onConfirm: async () => {
                 try {
                     await deleteArticle(id);
-                    setArticles(prev => prev.filter(a => a.id !== id));
+
+                    setArticles(prev =>
+                        prev.filter(a => a.id !== id)
+                    );
                 } catch (err) {
                     setError(err.message);
                 }
@@ -44,25 +58,47 @@ const HomePage = () => {
         });
     };
 
-    if (loading) return <div className="loading">Loading...</div>;
-    if (error) return <div className="error">Error: {error}</div>;
+    if (loading) {
+        return <div className="loading">Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="error">Error: {error}</div>;
+    }
 
     return (
         <div className="home-container">
-            <h1 className="home-title">Articles</h1>
+            <h1 className="home-title">
+                {tag ? `Articles tagged with "${tag}"` : 'Articles'}
+            </h1>
+
+            {tag && (
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <button
+                        className="btn"
+                        onClick={() => navigate('/')}
+                    >
+                        Clear Filter
+                    </button>
+                </div>
+            )}
 
             <div className="articles-grid">
                 {articles.map(article => (
-                    <SpotlightCard key={article.id} spotlightColor="rgba(0, 229, 255, 0.2)">
-                        
-                        <div 
+                    <SpotlightCard
+                        key={article.id}
+                        spotlightColor="rgba(0, 229, 255, 0.2)"
+                    >
+                        <div
                             onClick={() => navigate(`/article/${article.id}`)}
                             className="article-card"
                         >
                             <div className="article-card-header">
-                                <h2 className="article-card-title">{article.title}</h2>
+                                <h2 className="article-card-title">
+                                    {article.title}
+                                </h2>
 
-                                <button 
+                                <button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleDelete(article.id);
@@ -70,30 +106,55 @@ const HomePage = () => {
                                     className="delete-btn"
                                     title="Delete article"
                                 >
-                                    <img src="/trash.svg" alt="Delete" />
+                                    <img
+                                        src="/trash.svg"
+                                        alt="Delete"
+                                    />
                                 </button>
                             </div>
 
-                            <p className="article-author">Created by {article.authorUsername}</p>
+                            <p className="article-author">
+                                Created by {article.authorUsername}
+                            </p>
 
                             <p className={`article-card-content ${!article.summary ? 'no-summary' : ''}`}>
                                 {article.summary ? (
-                                    article.summary.length > 150 
-                                        ? `${article.summary.substring(0, 150)}...` 
+                                    article.summary.length > 150
+                                        ? `${article.summary.substring(0, 150)}...`
                                         : article.summary
                                 ) : (
-                                    "No summary was found for this article. Click to view details and create a summary."
+                                    'No summary was found for this article. Click to view details and create a summary.'
                                 )}
                             </p>
-                        </div>
 
+                            {/* TAGS */}
+                            <div className="article-tags">
+                                {article.tags?.map(tag => (
+                                    <span
+                                        key={tag.id}
+                                        className="tag-chip"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/?tag=${tag.name}`);
+                                        }}
+                                    >
+                                        #{tag.name}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
                     </SpotlightCard>
                 ))}
             </div>
 
             <Modal
                 isOpen={modal.isOpen}
-                onClose={() => setModal({ ...modal, isOpen: false })}
+                onClose={() =>
+                    setModal(prev => ({
+                        ...prev,
+                        isOpen: false
+                    }))
+                }
                 message={modal.message}
                 type={modal.type}
                 onConfirm={modal.onConfirm}
