@@ -156,6 +156,27 @@ public class ArticleController : ControllerBase
         }
     }
 
+    [HttpPost("{articleId}/collaborators/by-username/{username}")]
+    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
+    public async Task<IActionResult> AddCollaboratorByUsername(int articleId, string username)
+    {
+        try
+        {
+            var success = await _articleService.AddCollaboratorByUsernameAsync(articleId, username);
+            if (!success) return BadRequest("User is already a collaborator or invalid user.");
+            return NoContent();
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return StatusCode(500, "Failed to add collaborator.");
+        }
+    }
+
     [HttpDelete("{articleId}/collaborators/{userId}")]
     [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<IActionResult> RemoveCollaborator(int articleId, string userId)

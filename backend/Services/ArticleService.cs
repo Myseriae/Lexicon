@@ -2,6 +2,7 @@ using Lexicon.Data;
 using Lexicon.DTOs;
 using Lexicon.Model;
 using Microsoft.Extensions.Logging;
+using Lexicon.Services.Auth;
 
 namespace Lexicon.Services;
 
@@ -9,12 +10,14 @@ public class ArticleService : IArticleService
 {
     private readonly IDataHandler _dataHandler;
     private readonly IWikipediaService _wikipediaService;
+    private readonly IAuthService _authService;
     private readonly ILogger<ArticleService> _logger;
 
-    public ArticleService(IDataHandler dataHandler, IWikipediaService wikipediaService, ILogger<ArticleService> logger)
+    public ArticleService(IDataHandler dataHandler, IWikipediaService wikipediaService, IAuthService authService, ILogger<ArticleService> logger)
     {
         _dataHandler = dataHandler;
         _wikipediaService = wikipediaService;
+        _authService = authService;
         _logger = logger;
     }
 
@@ -180,6 +183,17 @@ public class ArticleService : IArticleService
             _logger.LogError(ex, "Failed to add collaborator");
             throw;
         }
+    }
+
+    public async Task<bool> AddCollaboratorByUsernameAsync(int articleId, string username)
+    {
+        var userId = await _authService.GetUserIdByUsernameAsync(username);
+        if (userId == null)
+        {
+            throw new ArgumentException($"User with username '{username}' not found");
+        }
+
+        return await AddCollaboratorAsync(articleId, userId);
     }
 
     public async Task<bool> RemoveCollaboratorAsync(int articleId, string userId)

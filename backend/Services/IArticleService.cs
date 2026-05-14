@@ -13,6 +13,7 @@ public interface IArticleService
     Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId);
     Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId);
     Task<bool> AddCollaboratorAsync(int articleId, string userId);
+    Task<bool> AddCollaboratorByUsernameAsync(int articleId, string username);
     Task<bool> RemoveCollaboratorAsync(int articleId, string userId);
     Task<bool> IsCollaboratorAsync(int articleId, string userId);
 }

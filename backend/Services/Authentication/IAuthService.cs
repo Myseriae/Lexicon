@@ -15,4 +15,7 @@ public interface IAuthService
 
     /// <summary>Revokes the refresh token so it can no longer be used.</summary>
     Task<bool> LogoutAsync(string refreshToken);
+
+    /// <summary>Finds a user by username and returns their ID.</summary>
+    Task<string?> GetUserIdByUsernameAsync(string username);
 }

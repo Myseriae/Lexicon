@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import { getArticle, updateArticle, deleteArticle } from '../api/api';
+import { getArticle, updateArticle, deleteArticle, getCollaborators } from '../api/api';
 import { getCurrentUser } from '../utils/jwtUtils';
 import Modal from '../components/Modal/Modal';
+import Collaborators from '../components/Collaborators/Collaborators';
 import './ArticlePage.css';
 
 const ArticlePage = () => {
@@ -16,21 +17,39 @@ const ArticlePage = () => {
   const [saving, setSaving] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
+  const [collaborators, setCollaborators] = useState([]);
   const navigate = useNavigate();
 
+  // Fetch collaborators
+  const fetchCollaborators = async () => {
+    try {
+      const data = await getCollaborators(id);
+      setCollaborators(data);
+    } catch (err) {
+      console.error('Failed to fetch collaborators:', err);
+    }
+  };
+
   useEffect(() => {
-    const fetchArticle = async () => {
+    const fetchArticleAndCollaborators = async () => {
       try {
         setError(null);
         const data = await getArticle(id);
         setArticle(data);
         setFormData({ title: data.title, content: data.content, summary: data.summary || '' });
+
+        // Fetch collaborators if the user is logged in
+        const user = getCurrentUser();
+        if (user) {
+          const collabData = await getCollaborators(id);
+          setCollaborators(collabData);
+        }
       } catch (err) {
         setError(err.message);
       }
     };
 
-    fetchArticle();
+    fetchArticleAndCollaborators();
   }, [id]);
 
   // Get current user on component mount
@@ -42,11 +61,11 @@ const ArticlePage = () => {
   // Check permissions when article or user changes
   useEffect(() => {
     if (article && currentUser) {
-      const hasEditPermission =
-        currentUser.id === article.authorId ||
-        currentUser.role === 'Admin' ||
-        (article.collaboratorIds && article.collaboratorIds.includes(currentUser.id));
+      const isAuthor = currentUser.id === article.authorId;
+      const isAdmin = currentUser.role === 'Admin';
+      const isCollaborator = article.collaboratorIds && article.collaboratorIds.includes(currentUser.id);
 
+      const hasEditPermission = isAuthor || isAdmin || isCollaborator;
       setCanEdit(hasEditPermission);
     }
   }, [article, currentUser]);
@@ -99,19 +118,31 @@ const ArticlePage = () => {
           <p className="article-content">{article.content}</p>
 
            <div className="article-actions">
-             {canEdit && (
-               <>
-                 <button onClick={() => setEditMode(true)} className="btn" disabled={saving}>Edit</button>
-                 <button onClick={handleDelete} className="btn btn-delete" disabled={saving}>Delete</button>
-               </>
-             )}
-             {!canEdit && currentUser && (
-               <p className="no-permission">You don't have permission to edit this article</p>
-             )}
-             {!currentUser && (
-               <p className="no-permission">Please log in to edit articles</p>
-             )}
-           </div>
+              {canEdit && (
+                <>
+                  <button onClick={() => setEditMode(true)} className="btn" disabled={saving}>Edit</button>
+                  <button onClick={handleDelete} className="btn btn-delete" disabled={saving}>Delete</button>
+                </>
+              )}
+              {!canEdit && currentUser && (
+                <p className="no-permission">You don't have permission to edit this article</p>
+              )}
+              {!currentUser && (
+                <p className="no-permission">Please log in to edit articles</p>
+              )}
+            </div>
+
+            {/* Show collaborators section to author and collaborators */}
+            {article && currentUser && (canEdit) && (
+              <Collaborators
+                articleId={article.id}
+                collaborators={collaborators}
+                authorId={article.authorId}
+                isAuthor={currentUser.id === article.authorId}
+                onCollaboratorAdded={fetchCollaborators}
+                onCollaboratorRemoved={fetchCollaborators}
+              />
+            )}
         </>
       ) : article && (
         <>

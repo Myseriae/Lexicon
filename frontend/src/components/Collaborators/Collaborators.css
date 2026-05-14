@@ -1,0 +1,195 @@
+.collaborators-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border-left: 4px solid #4a90e2;
+}
+
+.collaborators-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.collaborators-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.collaborator-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem;
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.collaborator-info {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 1;
+}
+
+.collaborator-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.collaborator-id {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.collaborator-badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.author-badge {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.btn-remove-collaborator {
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 0.8rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-remove-collaborator:hover:not(:disabled) {
+  background-color: #ff5252;
+}
+
+.btn-remove-collaborator:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.add-collaborator-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+.btn-add-collaborator {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-add-collaborator:hover:not(:disabled) {
+  background-color: #357abd;
+}
+
+.btn-add-collaborator:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.add-collaborator-form {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.collaborator-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.collaborator-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+}
+
+.collaborator-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.btn-confirm {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-confirm:hover:not(:disabled) {
+  background-color: #357abd;
+}
+
+.btn-confirm:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.btn-cancel:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.collaborators-error {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #c62828;
+}
+
+.collaborators-success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #2e7d32;
+}
+

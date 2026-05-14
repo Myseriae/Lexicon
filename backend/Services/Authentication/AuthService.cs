@@ -139,6 +139,7 @@ public class AuthService : IAuthService
     // Logout — revokes refresh token so it can no longer be rotated
     // -------------------------------------------------------------------------
 
+    /// <summary>Revokes the refresh token so it can no longer be used.</summary>
     public async Task<bool> LogoutAsync(string incomingRefreshToken)
     {
         var stored = await _context.RefreshTokens
@@ -152,6 +153,13 @@ public class AuthService : IAuthService
 
         _logger.LogInformation("Refresh token revoked for user '{UserId}'.", stored.UserId);
         return true;
+    }
+
+    /// <summary>Finds a user by username and returns their ID.</summary>
+    public async Task<string?> GetUserIdByUsernameAsync(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+        return user?.Id;
     }
 
     // -------------------------------------------------------------------------

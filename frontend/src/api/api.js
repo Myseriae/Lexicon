@@ -71,3 +71,33 @@ export const deleteArticle = (id) => {
 export const searchArticles = (query) => {
     return fetchWrapper(`/api/articles/search?query=${encodeURIComponent(query)}`);
 };
+
+// Collaborator endpoints
+export const getCollaborators = (articleId) => {
+    return fetchWrapper(`/api/articles/${articleId}/collaborators`);
+};
+
+export const addCollaborator = (articleId, userId) => {
+    return fetchWrapper(`/api/articles/${articleId}/collaborators/${userId}`, {
+        method: 'POST',
+    });
+};
+
+export const addCollaboratorByUsername = (articleId, username) => {
+    return fetchWrapper(
+        `/api/articles/${articleId}/collaborators/by-username/${encodeURIComponent(username)}`,
+        {
+            method: 'POST',
+        }
+    );
+};
+
+export const removeCollaborator = (articleId, userId) => {
+    return fetchWrapper(`/api/articles/${articleId}/collaborators/${userId}`, {
+        method: 'DELETE',
+    });
+};
+
+export const isCollaborator = (articleId, userId) => {
+    return fetchWrapper(`/api/articles/${articleId}/collaborators/${userId}/is-collaborator`);
+};
