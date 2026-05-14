@@ -18,4 +18,7 @@ public interface IAuthService
 
     /// <summary>Finds a user by username and returns their ID.</summary>
     Task<string?> GetUserIdByUsernameAsync(string username);
+
+    /// <summary>Finds a user by ID and returns their username.</summary>
+    Task<string?> GetUsernameByIdAsync(string userId);
 }

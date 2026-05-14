@@ -21,23 +21,42 @@ public class ArticleService : IArticleService
         _logger = logger;
     }
 
-    private static ArticleResponse ToResponse(Article article) => new ArticleResponse
+    private async Task<string> GetUsernameByIdAsync(string userId)
     {
-        Id = article.Id,
-        AuthorId = article.AuthorId,
-        Title = article.Title,
-        Content = article.Content,
-        Summary = article.Summary,
-        Created = article.Created
-    };
+        try
+        {
+            return await _authService.GetUsernameByIdAsync(userId) ?? userId;
+        }
+        catch
+        {
+            return userId; // Fallback to userId if username resolution fails
+        }
+    }
 
-    private async Task<ArticleResponse> ToResponseWithCollaboratorsAsync(Article article)
+    private async Task<ArticleResponse> ToResponseAsync(Article article)
     {
-        var collaborators = await _dataHandler.GetCollaboratorsAsync(article.Id);
+        var authorUsername = await GetUsernameByIdAsync(article.AuthorId);
         return new ArticleResponse
         {
             Id = article.Id,
             AuthorId = article.AuthorId,
+            AuthorUsername = authorUsername,
+            Title = article.Title,
+            Content = article.Content,
+            Summary = article.Summary,
+            Created = article.Created
+        };
+    }
+
+    private async Task<ArticleResponse> ToResponseWithCollaboratorsAsync(Article article)
+    {
+        var collaborators = await _dataHandler.GetCollaboratorsAsync(article.Id);
+        var authorUsername = await GetUsernameByIdAsync(article.AuthorId);
+        return new ArticleResponse
+        {
+            Id = article.Id,
+            AuthorId = article.AuthorId,
+            AuthorUsername = authorUsername,
             Title = article.Title,
             Content = article.Content,
             Summary = article.Summary,
@@ -49,8 +68,12 @@ public class ArticleService : IArticleService
     public async Task<IEnumerable<ArticleResponse>> GetArticlesAsync()
     {
         var articles = await _dataHandler.GetArticlesAsync();
-        return (articles ?? new List<Article>())
-            .Select(ToResponse);
+        var responses = new List<ArticleResponse>();
+        foreach (var article in articles ?? new List<Article>())
+        {
+            responses.Add(await ToResponseAsync(article));
+        }
+        return responses;
     }
 
     public async Task<ArticleResponse?> GetArticleByIdAsync(int id)
@@ -82,7 +105,7 @@ public class ArticleService : IArticleService
         try
         {
             var saved = await _dataHandler.AddArticleAsync(article);
-            return ToResponse(saved);
+            return await ToResponseAsync(saved);
         }
         catch (Exception ex)
         {
@@ -140,9 +163,16 @@ public class ArticleService : IArticleService
         }
     }
 
-    public IEnumerable<ArticleResponse> Search(string query)
-        => _dataHandler.SearchArticlesAsync(query).GetAwaiter().GetResult()
-            .Select(ToResponse);
+    public async Task<IEnumerable<ArticleResponse>> SearchAsync(string query)
+    {
+        var articles = await _dataHandler.SearchArticlesAsync(query);
+        var responses = new List<ArticleResponse>();
+        foreach (var article in articles ?? new List<Article>())
+        {
+            responses.Add(await ToResponseAsync(article));
+        }
+        return responses;
+    }
 
     private static RevisionResponse ToRevisionResponse(Revision revision) => new RevisionResponse
     {

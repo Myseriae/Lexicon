@@ -162,6 +162,13 @@ public class AuthService : IAuthService
         return user?.Id;
     }
 
+    /// <summary>Finds a user by ID and returns their username.</summary>
+    public async Task<string?> GetUsernameByIdAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        return user?.UserName;
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------

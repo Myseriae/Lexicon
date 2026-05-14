@@ -30,6 +30,13 @@
   flex: 1;
 }
 
+.article-author {
+  color: #00cfff;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
 .delete-btn {
   background: none;
   border: none;
@@ -70,4 +77,3 @@
 .error {
   color: #ff4d4d;
 }
-

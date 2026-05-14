@@ -78,6 +78,13 @@
   color: #666;
 }
 
+.article-author {
+  color: #00cfff;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
 .loading {
   color: #fff;
 }

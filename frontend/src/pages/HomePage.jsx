@@ -74,6 +74,8 @@ const HomePage = () => {
                                 </button>
                             </div>
 
+                            <p className="article-author">Created by {article.authorUsername}</p>
+
                             <p className={`article-card-content ${!article.summary ? 'no-summary' : ''}`}>
                                 {article.summary ? (
                                     article.summary.length > 150 
