@@ -44,6 +44,10 @@ namespace Lexicon.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[] { "seed-user", 0, "STATIC_CONCURRENCY_STAMP", "seed@test.com", true, false, null, "SEED@TEST.COM", "SEEDUSER", "AQAAAAIAAYagAAAAEL7yNihVlaTYLNGbmmYcPSdNZ9x5oCOZRC13du/DRVrQ+QGkJpqVdLFPBol4Bf8ZDg==", null, false, "STATIC_SECURITY_STAMP", false, "seeduser" });
 
+            migrationBuilder.Sql(
+                "UPDATE [Articles] SET [AuthorId] = 'seed-user' " +
+                "WHERE [AuthorId] = '' OR [AuthorId] NOT IN (SELECT [Id] FROM [AspNetUsers])");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Articles_AuthorId",
                 table: "Articles",
