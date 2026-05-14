@@ -21,4 +21,7 @@ public class Article
     public DateTime Created { get; set; } = DateTime.UtcNow;
     public List<Revision> Revisions { get; set; } = new List<Revision>();
     public List<ArticleCollaborator> Collaborators { get; set; } = new List<ArticleCollaborator>();
+    
+    public List<Tag> Tags { get; set; } = new();
+    
 }

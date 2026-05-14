@@ -4,7 +4,7 @@ namespace Lexicon.Data;
 
 public interface IDataHandler
 {
-        Task<IEnumerable<Article>> GetArticlesAsync();
+        Task<IEnumerable<Article>> GetArticlesAsync(string? tag = null);
         Task<Article?> GetArticleByIdAsync(int id);
         Task<Article> AddArticleAsync(Article article);
         Task<bool> DeleteArticleAsync(int id);

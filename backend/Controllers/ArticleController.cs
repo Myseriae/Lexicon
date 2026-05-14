@@ -23,9 +23,9 @@ public class ArticleController : ControllerBase
     // -------------------------------------------------------------------------
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ArticleResponse>>> GetArticles()
+    public async Task<ActionResult<IEnumerable<ArticleResponse>>> GetArticles([FromQuery] string? tag)
     {
-        var articles = await _articleService.GetArticlesAsync();
+        var articles = await _articleService.GetArticlesAsync(tag);
         return Ok(articles);
     }
 
@@ -38,7 +38,7 @@ public class ArticleController : ControllerBase
     }
 
     [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<ArticleResponse>>> Search(string query)
+    public async Task<ActionResult<IEnumerable<ArticleResponse>>> Search([FromQuery] string query)
         => Ok(await _articleService.SearchAsync(query));
 
     [HttpGet("{articleId}/revisions")]

@@ -44,7 +44,12 @@ public class ArticleService : IArticleService
             Title = article.Title,
             Content = article.Content,
             Summary = article.Summary,
-            Created = article.Created
+            Created = article.Created,
+            Tags = article.Tags.Select(t => new TagResponse
+            {
+                Id = t.Id,
+                Name = t.Name
+            }).ToList()
         };
     }
 
@@ -61,13 +66,18 @@ public class ArticleService : IArticleService
             Content = article.Content,
             Summary = article.Summary,
             Created = article.Created,
-            CollaboratorIds = collaborators.Select(c => c.UserId).ToList()
+            CollaboratorIds = collaborators.Select(c => c.UserId).ToList(),
+            Tags = article.Tags.Select(t => new TagResponse
+            {
+                Id = t.Id,
+                Name = t.Name
+            }).ToList()
         };
     }
 
-    public async Task<IEnumerable<ArticleResponse>> GetArticlesAsync()
+    public async Task<IEnumerable<ArticleResponse>> GetArticlesAsync(string? tag = null)
     {
-        var articles = await _dataHandler.GetArticlesAsync();
+        var articles = await _dataHandler.GetArticlesAsync(tag);
         var responses = new List<ArticleResponse>();
         foreach (var article in articles ?? new List<Article>())
         {

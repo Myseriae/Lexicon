@@ -11,12 +11,13 @@ public class LexiconDbContext : IdentityDbContext<IdentityUser, IdentityRole, st
         : base(options)
     {
     }
-    
+
     public DbSet<Article> Articles { get; set; }
     public DbSet<Revision> Revisions { get; set; }
     public DbSet<ArticleCollaborator> ArticleCollaborators { get; set; }
     
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Tag> Tags { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,11 +38,40 @@ public class LexiconDbContext : IdentityDbContext<IdentityUser, IdentityRole, st
 
         modelBuilder.Entity<IdentityUser>().HasData(seedUser);
 
+
+        modelBuilder.Entity<Tag>()
+            .Property(t => t.Name)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        modelBuilder.Entity<Tag>()
+            .HasIndex(t => t.Name)
+            .IsUnique();
+
         modelBuilder.Entity<Article>()
             .HasOne<IdentityUser>()
             .WithMany()
             .HasForeignKey(a => a.AuthorId)
             .IsRequired();
+
+        modelBuilder.Entity<Article>()
+            .HasMany(a => a.Tags)
+            .WithMany(t => t.Articles)
+            .UsingEntity<Dictionary<string, object>>(
+                "ArticleTags",
+                j => j.HasOne<Tag>()
+                    .WithMany()
+                    .HasForeignKey("TagId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<Article>()
+                    .WithMany()
+                    .HasForeignKey("ArticleId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j =>
+                {
+                    j.HasKey("ArticleId", "TagId");
+                    j.ToTable("ArticleTags");
+                });
 
         modelBuilder.Entity<Article>().HasData(
             new Article
