@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { createArticle } from '../api/api';
 import Modal from '../components/Modal/Modal';
+import MDEditor from '@uiw/react-md-editor';
+import '@uiw/react-md-editor/markdown-editor.css';
+import '@uiw/react-md-editor/markdown.css';
 import './CreatePage.css';
 
 const CreatePage = () => {
@@ -65,14 +68,14 @@ const CreatePage = () => {
         </div>
         <div className="form-group">
           <label htmlFor="content" className="form-label">Content:</label>
-          <textarea
+          <MDEditor
             id="content"
-            name="content"
             value={formData.content}
-            onChange={handleChange}
+            onChange={(value) => {
+              setError(null);
+              setFormData(prev => ({ ...prev, content: value || '' }));
+            }}
             className="form-textarea"
-            required
-            disabled={loading}
           />
         </div>
         <button type="submit" disabled={loading} className="submit-btn">
