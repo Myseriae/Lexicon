@@ -8,14 +8,16 @@ namespace Lexicon.Services;
 
 public class ArticleService : IArticleService
 {
-    private readonly IDataHandler _dataHandler;
+    private readonly IArticleRepository _articleRepository;
+    private readonly IRevisionRepository _revisionRepository;
     private readonly IWikipediaService _wikipediaService;
     private readonly IAuthService _authService;
     private readonly ILogger<ArticleService> _logger;
 
-    public ArticleService(IDataHandler dataHandler, IWikipediaService wikipediaService, IAuthService authService, ILogger<ArticleService> logger)
+    public ArticleService(IArticleRepository articleRepository, IRevisionRepository revisionRepository, IWikipediaService wikipediaService, IAuthService authService, ILogger<ArticleService> logger)
     {
-        _dataHandler = dataHandler;
+        _articleRepository = articleRepository;
+        _revisionRepository = revisionRepository;
         _wikipediaService = wikipediaService;
         _authService = authService;
         _logger = logger;
@@ -29,7 +31,7 @@ public class ArticleService : IArticleService
         }
         catch
         {
-            return userId; // Fallback to userId if username resolution fails
+            return userId;
         }
     }
 
@@ -55,7 +57,7 @@ public class ArticleService : IArticleService
 
     private async Task<ArticleResponse> ToResponseWithCollaboratorsAsync(Article article)
     {
-        var collaborators = await _dataHandler.GetCollaboratorsAsync(article.Id);
+        var collaborators = await _articleRepository.GetCollaboratorsAsync(article.Id);
         var authorUsername = await GetUsernameByIdAsync(article.AuthorId);
         return new ArticleResponse
         {
@@ -77,7 +79,7 @@ public class ArticleService : IArticleService
 
     public async Task<IEnumerable<ArticleResponse>> GetArticlesAsync(string? tag = null)
     {
-        var articles = await _dataHandler.GetArticlesAsync(tag);
+        var articles = await _articleRepository.GetArticlesAsync(tag);
         var responses = new List<ArticleResponse>();
         foreach (var article in articles ?? new List<Article>())
         {
@@ -88,7 +90,7 @@ public class ArticleService : IArticleService
 
     public async Task<ArticleResponse?> GetArticleByIdAsync(int id)
     {
-        var article = await _dataHandler.GetArticleByIdAsync(id);
+        var article = await _articleRepository.GetArticleByIdAsync(id);
         return article == null ? null : await ToResponseWithCollaboratorsAsync(article);
     }
 
@@ -114,7 +116,7 @@ public class ArticleService : IArticleService
 
         try
         {
-            var saved = await _dataHandler.AddArticleAsync(article);
+            var saved = await _articleRepository.AddArticleAsync(article);
             return await ToResponseAsync(saved);
         }
         catch (Exception ex)
@@ -126,7 +128,7 @@ public class ArticleService : IArticleService
 
     public async Task<bool> DeleteArticleAsync(int id, string userId, bool isAdmin)
     {
-        var article = await _dataHandler.GetArticleByIdAsync(id);
+        var article = await _articleRepository.GetArticleByIdAsync(id);
         if (article == null) return false;
 
         if (!await CanEditArticle(article, userId, isAdmin))
@@ -136,7 +138,7 @@ public class ArticleService : IArticleService
 
         try
         {
-            return await _dataHandler.DeleteArticleAsync(id);
+            return await _articleRepository.DeleteArticleAsync(id);
         }
         catch (Exception ex)
         {
@@ -147,7 +149,7 @@ public class ArticleService : IArticleService
 
     public async Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request, string userId, bool isAdmin)
     {
-        var current = await _dataHandler.GetArticleByIdAsync(id);
+        var current = await _articleRepository.GetArticleByIdAsync(id);
         if (current == null) return false;
 
         if (!await CanEditArticle(current, userId, isAdmin))
@@ -164,7 +166,7 @@ public class ArticleService : IArticleService
 
         try
         {
-            return await _dataHandler.UpdateArticleAsync(id, article, current.Content, current.Summary);
+            return await _articleRepository.UpdateArticleAsync(id, article, current.Content, current.Summary);
         }
         catch (Exception ex)
         {
@@ -175,7 +177,7 @@ public class ArticleService : IArticleService
 
     public async Task<IEnumerable<ArticleResponse>> SearchAsync(string query)
     {
-        var articles = await _dataHandler.SearchArticlesAsync(query);
+        var articles = await _articleRepository.SearchArticlesAsync(query);
         var responses = new List<ArticleResponse>();
         foreach (var article in articles ?? new List<Article>())
         {
@@ -196,7 +198,7 @@ public class ArticleService : IArticleService
 
     public async Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId)
     {
-        var revisions = await _dataHandler.GetRevisionsAsync(articleId);
+        var revisions = await _revisionRepository.GetRevisionsAsync(articleId);
         return revisions.Select(ToRevisionResponse);
     }
 
@@ -208,7 +210,7 @@ public class ArticleService : IArticleService
 
     public async Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId)
     {
-        var collaborators = await _dataHandler.GetCollaboratorsAsync(articleId);
+        var collaborators = await _articleRepository.GetCollaboratorsAsync(articleId);
         return collaborators.Select(ToCollaboratorResponse);
     }
 
@@ -216,7 +218,7 @@ public class ArticleService : IArticleService
     {
         try
         {
-            return await _dataHandler.AddCollaboratorAsync(articleId, userId);
+            return await _articleRepository.AddCollaboratorAsync(articleId, userId);
         }
         catch (Exception ex)
         {
@@ -240,7 +242,7 @@ public class ArticleService : IArticleService
     {
         try
         {
-            return await _dataHandler.RemoveCollaboratorAsync(articleId, userId);
+            return await _articleRepository.RemoveCollaboratorAsync(articleId, userId);
         }
         catch (Exception ex)
         {
@@ -253,7 +255,7 @@ public class ArticleService : IArticleService
     {
         try
         {
-            return await _dataHandler.IsCollaboratorAsync(articleId, userId);
+            return await _articleRepository.IsCollaboratorAsync(articleId, userId);
         }
         catch (Exception ex)
         {
@@ -264,15 +266,9 @@ public class ArticleService : IArticleService
 
     private async Task<bool> CanEditArticle(Article article, string userId, bool isAdmin)
     {
-        // Admin can always edit
         if (isAdmin) return true;
-
-        // Author can edit
         if (article.AuthorId == userId) return true;
-
-        // Collaborator can edit
-        if (await _dataHandler.IsCollaboratorAsync(article.Id, userId)) return true;
-
+        if (await _articleRepository.IsCollaboratorAsync(article.Id, userId)) return true;
         return false;
     }
 }

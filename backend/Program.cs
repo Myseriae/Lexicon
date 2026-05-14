@@ -13,7 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // --- Application services ---
-builder.Services.AddScoped<IDataHandler, EFDataHandler>();
+builder.Services.AddScoped<IArticleRepository, EFArticleRepository>();
+builder.Services.AddScoped<IRevisionRepository, EFRevisionRepository>();
 builder.Services.AddScoped<ITagRepository, EFTagRepository>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
 builder.Services.AddHttpClient<IWikipediaService, WikipediaService>(client =>

@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Lexicon.Data;
 
-public class EFDataHandler : IDataHandler
+public class EFArticleRepository : IArticleRepository
 {
     private readonly LexiconDbContext _context;
 
-    public EFDataHandler(LexiconDbContext context)
+    public EFArticleRepository(LexiconDbContext context)
     {
         _context = context;
     }
@@ -81,14 +81,6 @@ public class EFDataHandler : IDataHandler
         return true;
     }
 
-    public async Task<IEnumerable<Revision>> GetRevisionsAsync(int articleId)
-    {
-        return await _context.Revisions
-            .Where(r => r.ArticleId == articleId)
-            .OrderBy(r => r.VersionNumber)
-            .ToListAsync();
-    }
-
     public async Task<IEnumerable<Article>> SearchArticlesAsync(string query)
     {
         var pattern = $"%{query}%";
@@ -111,7 +103,7 @@ public class EFDataHandler : IDataHandler
     public async Task<bool> AddCollaboratorAsync(int articleId, string userId)
     {
         if (await _context.ArticleCollaborators.AnyAsync(ac => ac.ArticleId == articleId && ac.UserId == userId))
-            return false; // Already a collaborator
+            return false;
 
         var collaborator = new ArticleCollaborator { ArticleId = articleId, UserId = userId };
         _context.ArticleCollaborators.Add(collaborator);

@@ -2,6 +2,7 @@ using Lexicon.Data;
 using Lexicon.DTOs;
 using Lexicon.Model;
 using Lexicon.Services;
+using Lexicon.Services.Auth;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -10,18 +11,25 @@ namespace LexiconTest;
 [TestFixture]
 public class ArticleServiceTests
 {
-    private Mock<IDataHandler> _dataHandlerMock;
+    private Mock<IArticleRepository> _articleRepoMock;
+    private Mock<IRevisionRepository> _revisionRepoMock;
     private Mock<IWikipediaService> _wikipediaMock;
+    private Mock<IAuthService> _authServiceMock;
     private Mock<ILogger<ArticleService>> _loggerMock;
     private ArticleService _service;
 
     [SetUp]
     public void Setup()
     {
-        _dataHandlerMock = new Mock<IDataHandler>();
+        _articleRepoMock = new Mock<IArticleRepository>();
+        _revisionRepoMock = new Mock<IRevisionRepository>();
         _wikipediaMock = new Mock<IWikipediaService>();
+        _authServiceMock = new Mock<IAuthService>();
         _loggerMock = new Mock<ILogger<ArticleService>>();
-        _service = new ArticleService(_dataHandlerMock.Object, _wikipediaMock.Object, _loggerMock.Object);
+        _authServiceMock
+            .Setup(a => a.GetUsernameByIdAsync(It.IsAny<string>()))
+            .ReturnsAsync((string id) => id);
+        _service = new ArticleService(_articleRepoMock.Object, _revisionRepoMock.Object, _wikipediaMock.Object, _authServiceMock.Object, _loggerMock.Object);
     }
 
     [Test]
@@ -33,7 +41,7 @@ public class ArticleServiceTests
             .Setup(w => w.GetSummaryAsync("Cat"))
             .ReturnsAsync("Cat summary");
 
-        _dataHandlerMock
+        _articleRepoMock
             .Setup(d => d.AddArticleAsync(It.IsAny<Article>()))
             .ReturnsAsync((Article a) => a);
 
@@ -41,7 +49,7 @@ public class ArticleServiceTests
 
         Assert.That(result.Summary, Is.EqualTo("Cat summary"));
         _wikipediaMock.Verify(w => w.GetSummaryAsync("Cat"), Times.Once);
-        _dataHandlerMock.Verify(d => d.AddArticleAsync(It.IsAny<Article>()), Times.Once);
+        _articleRepoMock.Verify(d => d.AddArticleAsync(It.IsAny<Article>()), Times.Once);
     }
 
     [Test]
@@ -49,7 +57,7 @@ public class ArticleServiceTests
     {
         var request = new CreateArticleRequest { Title = "Dog", Content = "Info about dogs.", Summary = "Already exists" };
 
-        _dataHandlerMock
+        _articleRepoMock
             .Setup(d => d.AddArticleAsync(It.IsAny<Article>()))
             .ReturnsAsync((Article a) => a);
 
@@ -68,31 +76,31 @@ public class ArticleServiceTests
             .Setup(w => w.GetSummaryAsync("Unknown"))
             .ReturnsAsync((string?)null);
 
-        _dataHandlerMock
+        _articleRepoMock
             .Setup(d => d.AddArticleAsync(It.IsAny<Article>()))
             .ReturnsAsync((Article a) => a);
 
         var result = await _service.AddArticleAsync(request, "test-user");
 
         Assert.That(result.Summary, Is.Null.Or.Empty);
-        _dataHandlerMock.Verify(d => d.AddArticleAsync(It.IsAny<Article>()), Times.Once);
+        _articleRepoMock.Verify(d => d.AddArticleAsync(It.IsAny<Article>()), Times.Once);
     }
 
     [Test]
-    public void Search_FiltersCorrectly_AndCaseInsensitive()
+    public async Task SearchAsync_FiltersCorrectly_AndCaseInsensitive()
     {
         var articles = new List<Article>
         {
-            new Article { Title = "Apple" },
-            new Article { Title = "Banana" },
-            new Article { Title = "Pineapple" }
+            new Article { Title = "Apple", Tags = new List<Tag>() },
+            new Article { Title = "Banana", Tags = new List<Tag>() },
+            new Article { Title = "Pineapple", Tags = new List<Tag>() }
         };
 
-        _dataHandlerMock
+        _articleRepoMock
             .Setup(d => d.SearchArticlesAsync("apple"))
             .ReturnsAsync(articles.Where(a => a.Title.ToLower().Contains("apple")).ToList());
 
-        var result = _service.Search("apple").ToList();
+        var result = (await _service.SearchAsync("apple")).ToList();
 
         Assert.That(result.Count, Is.EqualTo(2));
         Assert.That(result.Any(a => a.Title == "Apple"), Is.True);
@@ -102,7 +110,7 @@ public class ArticleServiceTests
     [Test]
     public async Task DeleteArticleAsync_ReturnsFalse_WhenNotFound()
     {
-        _dataHandlerMock
+        _articleRepoMock
             .Setup(d => d.GetArticleByIdAsync(99))
             .ReturnsAsync((Article?)null);
 
@@ -116,7 +124,7 @@ public class ArticleServiceTests
     {
         var request = new UpdateArticleRequest { Title = "Test", Content = "Some content." };
 
-        _dataHandlerMock
+        _articleRepoMock
             .Setup(d => d.GetArticleByIdAsync(99))
             .ReturnsAsync((Article?)null);
 
