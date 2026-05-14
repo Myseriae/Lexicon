@@ -5,6 +5,7 @@ const API_BASE_URL = '';
 const fetchWrapper = async (url, options = {}) => {
   try {
     const response = await fetch(`${API_BASE_URL}${url}`, {
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -24,7 +25,6 @@ const fetchWrapper = async (url, options = {}) => {
         data?.message || `Request failed with status ${response.status}`
       );
     }
-
     return data;
   } catch (error) {
     throw new Error(error.message || 'Network error occurred');

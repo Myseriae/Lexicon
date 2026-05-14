@@ -35,22 +35,42 @@ public class AuthService : IAuthService
 
     public async Task<AuthResult> RegisterAsync(string email, string username, string password)
     {
-        var user   = new IdentityUser { UserName = username, Email = email };
+        var user = new IdentityUser
+        {
+            UserName = username,
+            Email = email
+        };
+
         var result = await _userManager.CreateAsync(user, password);
 
         if (!result.Succeeded)
         {
-            var failure = new AuthResult(false, email, username, string.Empty, string.Empty, string.Empty);
+            var failure = new AuthResult(false, "", "", email, username, "");
+        
             foreach (var error in result.Errors)
                 failure.ErrorMessages[error.Code] = error.Description;
+
             return failure;
         }
 
-        // All public registrations receive the Editor role.
+        // Assign default role
         await _userManager.AddToRoleAsync(user, Roles.Editor);
 
+        var role = Roles.Editor;
+
+        var accessToken  = _tokenService.CreateAccessToken(user, role);
+        var refreshToken = await CreateAndStoreRefreshTokenAsync(user.Id);
+
         _logger.LogInformation("User '{UserName}' registered.", username);
-        return new AuthResult(true, email, username, Roles.Editor, string.Empty, string.Empty);
+
+        return new AuthResult(
+            true,
+            accessToken,
+            refreshToken,
+            email,
+            username,
+            role
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -73,8 +93,15 @@ public class AuthService : IAuthService
         var refreshToken = await CreateAndStoreRefreshTokenAsync(user.Id);
 
         _logger.LogInformation("User '{UserName}' logged in.", user.UserName);
-        return new AuthResult(true, user.Email!, user.UserName!, role, accessToken, refreshToken);
-    }
+        
+        return new AuthResult(
+            true,
+            accessToken,
+            refreshToken,
+            user.Email!,
+            user.UserName!,
+            role
+        );    }
 
     // -------------------------------------------------------------------------
     // Refresh — validates old token, rotates it, issues new access token

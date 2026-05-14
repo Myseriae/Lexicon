@@ -125,7 +125,7 @@ public class AuthController : ControllerBase
         {
             Path     = "/api/auth/refresh",
             SameSite = SameSiteMode.Strict,
-            Secure   = true
+            Secure   = false
         });
 
         return NoContent();
@@ -170,7 +170,7 @@ public class AuthController : ControllerBase
         var options = new CookieOptions
         {
             HttpOnly = true,                          // JS cannot read this
-            Secure   = true,                          // HTTPS only — set false for local HTTP dev
+            Secure   = false,                          // HTTPS only — set false for local HTTP dev
             SameSite = SameSiteMode.Strict,           // not sent cross-site (CSRF protection)
             Path     = "/api/auth/refresh",           // cookie only sent to this path
             Expires  = DateTimeOffset.UtcNow.AddDays(7)
