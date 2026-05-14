@@ -1,6 +1,10 @@
-import { setToken, clearToken } from '../utils/jwtUtils';
+import { setToken, clearToken, getToken } from '../utils/jwtUtils';
 
 const API_BASE_URL = '';
+
+export const isAuthenticated = () => {
+  return !!getToken();
+};
 
 const fetchWrapper = async (url, options = {}) => {
   try {

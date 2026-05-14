@@ -205,6 +205,7 @@
 }
 
 .app-routes-container {
-  margin-top: 2rem;
+  margin-top: 64px;
+  padding: 2rem 1.5rem;
 }
 
