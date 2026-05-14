@@ -4,6 +4,9 @@ import { getArticle, updateArticle, deleteArticle, getCollaborators } from '../a
 import { getCurrentUser } from '../utils/jwtUtils';
 import Modal from '../components/Modal/Modal';
 import Collaborators from '../components/Collaborators/Collaborators';
+import MDEditor from '@uiw/react-md-editor';
+import ReactMarkdown from 'react-markdown';
+import '@uiw/react-md-editor/markdown-editor.css';
 import './ArticlePage.css';
 
 const ArticlePage = () => {
@@ -116,7 +119,7 @@ const ArticlePage = () => {
           <h1>{article.title}</h1>
           <p className="article-author">Created by {article.authorUsername}</p>
           <p className={`article-summary ${!article.summary ? 'no-summary' : ''}`}><strong>Summary:</strong> {article.summary || "Create a summary for this article."}</p>
-          <p className="article-content">{article.content}</p>
+          <div className="article-content"><ReactMarkdown>{article.content}</ReactMarkdown></div>
 
            <div className="article-actions">
               {canEdit && (
@@ -161,12 +164,11 @@ const ArticlePage = () => {
             placeholder="Summary"
             disabled={saving}
           />
-          <textarea
+          <MDEditor
             value={formData.content}
-            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+            onChange={(value) => setFormData({ ...formData, content: value || '' })}
             className="textarea"
-            placeholder="Content"
-            disabled={saving}
+            data-color-mode="dark"
           />
 
           <div className="article-actions">

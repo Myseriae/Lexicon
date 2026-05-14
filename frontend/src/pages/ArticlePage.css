@@ -106,3 +106,160 @@
   border-radius: 4px;
   margin-bottom: 1rem;
 }
+
+/* MDEditor dark theme overrides */
+.textarea.w-md-editor {
+  background-color: #222;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  padding: 0;
+  min-height: 150px;
+  resize: vertical;
+}
+
+.textarea.w-md-editor:focus-within {
+  border-color: #00cfff;
+  box-shadow: 0 0 5px rgba(0, 207, 255, 0.3);
+}
+
+.textarea .w-md-editor-toolbar {
+  background-color: #111;
+  border-bottom: 1px solid #444;
+}
+
+.textarea .w-md-editor-toolbar ul li button {
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.textarea .w-md-editor-toolbar ul li button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.textarea .w-md-editor-toolbar ul li button:hover {
+  color: #00cfff;
+  background-color: #222;
+}
+
+.textarea .w-md-editor-text-pre,
+.textarea .w-md-editor-text-input,
+.textarea .w-md-editor-text {
+  background-color: #222;
+  color: #ccc;
+  font-family: inherit;
+}
+
+
+.textarea .w-md-editor-preview {
+  background-color: #222;
+  color: #fff;
+}
+
+.textarea .wmde-markdown {
+  background-color: #222;
+  color: #fff;
+}
+
+.textarea .wmde-markdown h1,
+.textarea .wmde-markdown h2,
+.textarea .wmde-markdown h3,
+.textarea .wmde-markdown h4,
+.textarea .wmde-markdown h5,
+.textarea .wmde-markdown h6 {
+  color: #fff;
+  border-bottom-color: #444;
+}
+
+.textarea .wmde-markdown a {
+  color: #00cfff;
+}
+
+.textarea .wmde-markdown code,
+.textarea .wmde-markdown pre {
+  background-color: #111;
+  color: #00cfff;
+}
+
+.textarea .wmde-markdown blockquote {
+  border-left-color: #444;
+  color: #aaa;
+}
+
+.textarea .wmde-markdown hr {
+  border-color: #444;
+}
+
+/* ReactMarkdown view mode */
+.article-content .wmde-markdown,
+.article-content p,
+.article-content ul,
+.article-content ol {
+  color: #ccc;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  color: #fff;
+}
+
+.article-content a {
+  color: #00cfff;
+}
+
+.article-content code,
+.article-content pre {
+  background-color: #111;
+  color: #00cfff;
+  border-radius: 4px;
+  padding: 0.2em 0.4em;
+}
+
+.article-content pre code {
+  padding: 0;
+}
+
+.article-content blockquote {
+  border-left: 3px solid #444;
+  color: #aaa;
+  margin-left: 0;
+  padding-left: 1rem;
+}
+
+.article-content hr {
+  border-color: #444;
+}
+
+@media (max-width: 640px) {
+  .article-container {
+    padding: 1rem;
+  }
+
+  /* Toolbar scrolls horizontally instead of wrapping */
+  .textarea .w-md-editor-toolbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .textarea .w-md-editor-toolbar ul {
+    flex-wrap: nowrap;
+  }
+
+  /* On narrow screens hide the preview pane and go full-width edit */
+  .textarea .w-md-editor-preview {
+    display: none;
+  }
+
+  .textarea .w-md-editor-input {
+    width: 100% !important;
+    border-right: none;
+  }
+}
