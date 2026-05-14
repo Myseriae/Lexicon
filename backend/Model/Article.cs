@@ -19,4 +19,7 @@ public class Article
     public string? Summary { get; set; }
     public DateTime Created { get; set; } = DateTime.UtcNow;
     public List<Revision> Revisions { get; set; } = new List<Revision>();
+    
+    public List<Tag> Tags { get; set; } = new();
+    
 }

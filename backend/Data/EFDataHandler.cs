@@ -12,9 +12,27 @@ public class EFDataHandler : IDataHandler
         _context = context;
     }
 
-    public async Task<IEnumerable<Article>> GetArticlesAsync() => await _context.Articles.ToListAsync();
+    public async Task<IEnumerable<Article>> GetArticlesAsync(string? tag = null)
+    {
+        var query = _context.Articles
+            .Include(a => a.Tags)
+            .AsQueryable();
 
-    public async Task<Article?> GetArticleByIdAsync(int id) => await _context.Articles.FindAsync(id);
+        if (!string.IsNullOrWhiteSpace(tag))
+        {
+            query = query.Where(a =>
+                a.Tags.Any(t => EF.Functions.Like(t.Name, tag)));
+        }
+
+        return await query.ToListAsync();
+    }
+
+    public async Task<Article?> GetArticleByIdAsync(int id)
+    {
+        return await _context.Articles
+            .Include(a => a.Tags)
+            .FirstOrDefaultAsync(a => a.Id == id);
+    }
 
     public async Task<Article> AddArticleAsync(Article article)
     {
@@ -25,7 +43,10 @@ public class EFDataHandler : IDataHandler
 
     public async Task<bool> DeleteArticleAsync(int id)
     {
-        var article = await GetArticleByIdAsync(id);
+        var article = await _context.Articles
+            .Include(a => a.Tags)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
         if (article == null) return false;
 
         _context.Articles.Remove(article);
@@ -41,7 +62,7 @@ public class EFDataHandler : IDataHandler
         var revisionCount = await _context.Revisions
             .CountAsync(r => r.ArticleId == id);
 
-        var Revision = new Revision
+        var revision = new Revision
         {
             ArticleId = id,
             Content = previousContent,
@@ -50,23 +71,34 @@ public class EFDataHandler : IDataHandler
             SavedAt = DateTime.UtcNow
         };
 
-        _context.Revisions.Add(Revision);
+        _context.Revisions.Add(revision);
 
         existing.Title = article.Title;
         existing.Content = article.Content;
         existing.Summary = article.Summary;
+
         await _context.SaveChangesAsync();
         return true;
     }
 
-    public async Task<IEnumerable<Revision>> GetRevisionsAsync(int articleId) =>
-        await _context.Revisions
+    public async Task<IEnumerable<Revision>> GetRevisionsAsync(int articleId)
+    {
+        return await _context.Revisions
             .Where(r => r.ArticleId == articleId)
             .OrderBy(r => r.VersionNumber)
             .ToListAsync();
+    }
 
-    public async Task<IEnumerable<Article>> SearchArticlesAsync(string query) =>
-        await _context.Articles
-            .Where(a => a.Title.ToLower().Contains(query.ToLower()))
+    public async Task<IEnumerable<Article>> SearchArticlesAsync(string query)
+    {
+        var pattern = $"%{query}%";
+
+        return await _context.Articles
+            .Include(a => a.Tags)
+            .Where(a =>
+                EF.Functions.Like(a.Title, pattern) ||
+                EF.Functions.Like(a.Content, pattern) ||
+                a.Tags.Any(t => EF.Functions.Like(t.Name, pattern)))
             .ToListAsync();
+    }
 }

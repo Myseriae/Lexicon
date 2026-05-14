@@ -21,8 +21,8 @@ public class ArticleController : ControllerBase
     // -------------------------------------------------------------------------
 
     [HttpGet]
-    public ActionResult<IEnumerable<ArticleResponse>> GetArticles()
-        => Ok(_articleService.GetArticles());
+    public ActionResult<IEnumerable<ArticleResponse>> GetArticles([FromQuery] string? tag)
+        => Ok(_articleService.GetArticles(tag));
 
     [HttpGet("{articleId}")]
     public ActionResult<ArticleResponse> GetArticle(int articleId)
@@ -33,8 +33,13 @@ public class ArticleController : ControllerBase
     }
 
     [HttpGet("search")]
-    public ActionResult<IEnumerable<ArticleResponse>> Search(string query)
-        => Ok(_articleService.Search(query));
+    public ActionResult<IEnumerable<ArticleResponse>> Search([FromQuery] string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return Ok(_articleService.GetArticles());
+
+        return Ok(_articleService.Search(query));
+    }
 
     [HttpGet("{articleId}/revisions")]
     public async Task<ActionResult<IEnumerable<RevisionResponse>>> GetRevisions(int articleId)

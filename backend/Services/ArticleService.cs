@@ -25,11 +25,16 @@ public class ArticleService : IArticleService
         Title = article.Title,
         Content = article.Content,
         Summary = article.Summary,
-        Created = article.Created
+        Created = article.Created,
+        Tags = article.Tags.Select(t => new TagResponse
+        {
+            Id = t.Id,
+            Name = t.Name
+        }).ToList()
     };
 
-    public IEnumerable<ArticleResponse> GetArticles()
-        => _dataHandler.GetArticlesAsync().GetAwaiter().GetResult().Select(ToResponse);
+    public IEnumerable<ArticleResponse> GetArticles(string? tag = null)
+        => _dataHandler.GetArticlesAsync(tag).GetAwaiter().GetResult().Select(ToResponse);
 
     public ArticleResponse? GetArticleById(int id)
     {
