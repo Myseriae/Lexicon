@@ -1,166 +1,154 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getArticles, deleteArticle } from '../api/api';
-import SpotlightCard from '../components/SpotlightCard/SpotlightCard';
+import ArticleCard from '../components/ArticleCard/ArticleCard';
 import Modal from '../components/Modal/Modal';
 import './HomePage.css';
 
 const HomePage = () => {
-    const [articles, setArticles] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [modal, setModal] = useState({
-        isOpen: false,
-        message: '',
-        type: '',
-        onConfirm: null
-    });
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [modal, setModal] = useState({
+    isOpen: false,
+    message: '',
+    type: '',
+    onConfirm: null
+  });
 
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-    const tag = searchParams.get('tag');
+  const tag = searchParams.get('tag');
 
-    useEffect(() => {
-        const fetchArticles = async () => {
-            try {
-                setLoading(true);
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        setLoading(true);
 
-                const data = await getArticles(tag);
+        const data = await getArticles(tag);
 
-                setArticles(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchArticles();
-    }, [tag]);
-
-    const handleDelete = async (id) => {
-        setModal({
-            isOpen: true,
-            message: 'Are you sure you want to delete this article?',
-            type: 'confirm',
-            onConfirm: async () => {
-                try {
-                    await deleteArticle(id);
-
-                    setArticles(prev =>
-                        prev.filter(a => a.id !== id)
-                    );
-                } catch (err) {
-                    setError(err.message);
-                }
-            }
-        });
+        setArticles(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    if (loading) {
-        return <div className="loading">Loading...</div>;
-    }
+    fetchArticles();
+  }, [tag]);
 
-    if (error) {
-        return <div className="error">Error: {error}</div>;
-    }
+  const handleDelete = async (id) => {
+    setModal({
+      isOpen: true,
+      message: 'Are you sure you want to delete this article?',
+      type: 'confirm',
+      onConfirm: async () => {
+        try {
+          await deleteArticle(id);
 
-    return (
-        <div className="home-container">
-            <h1 className="home-title">
-                {tag ? `Articles tagged with "${tag}"` : 'Articles'}
-            </h1>
+          setArticles(prev =>
+            prev.filter(a => a.id !== id)
+          );
+        } catch (err) {
+          setError(err.message);
+        }
+      }
+    });
+  };
 
-            {tag && (
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <button
-                        className="btn"
-                        onClick={() => navigate('/')}
-                    >
-                        Clear Filter
-                    </button>
-                </div>
-            )}
+  if (loading) {
+    return <div className="home-loading">Loading...</div>;
+  }
 
-            <div className="articles-grid">
-                {articles.map(article => (
-                    <SpotlightCard
-                        key={article.id}
-                        spotlightColor="rgba(0, 229, 255, 0.2)"
-                    >
-                        <div
-                            onClick={() => navigate(`/article/${article.id}`)}
-                            className="article-card"
-                        >
-                            <div className="article-card-header">
-                                <h2 className="article-card-title">
-                                    {article.title}
-                                </h2>
+  if (error) {
+    return <div className="home-error">Error: {error}</div>;
+  }
 
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDelete(article.id);
-                                    }}
-                                    className="delete-btn"
-                                    title="Delete article"
-                                >
-                                    <img
-                                        src="/trash.svg"
-                                        alt="Delete"
-                                    />
-                                </button>
-                            </div>
+  return (
+    <div className="home-container">
+      <main className="home-main">
+        {/* Page Header */}
+        <header className="home-header">
+          <h1 className="home-title">
+            {tag ? `Articles tagged with "${tag}"` : 'The Morning Repository'}
+          </h1>
+          <p className="home-tagline">
+            {tag
+              ? `Refining your reading to focus on "${tag}"`
+              : 'A curated selection of scholarly inquiries, peer-reviewed observations, and archival deep-dives for the modern intellectual.'}
+          </p>
 
-                            <p className="article-author">
-                                Created by {article.authorUsername}
-                            </p>
+          {tag && (
+            <button
+              className="home-filter-clear"
+              onClick={() => navigate('/')}
+            >
+              Clear Filter
+            </button>
+          )}
+        </header>
 
-                            <p className={`article-card-content ${!article.summary ? 'no-summary' : ''}`}>
-                                {article.summary ? (
-                                    article.summary.length > 150
-                                        ? `${article.summary.substring(0, 150)}...`
-                                        : article.summary
-                                ) : (
-                                    'No summary was found for this article. Click to view details and create a summary.'
-                                )}
-                            </p>
-
-                            {/* TAGS */}
-                            <div className="article-tags">
-                                {article.tags?.map(tag => (
-                                    <span
-                                        key={tag.id}
-                                        className="tag-chip"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(`/?tag=${tag.name}`);
-                                        }}
-                                    >
-                                        #{tag.name}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    </SpotlightCard>
-                ))}
+        {/* Article Feed */}
+        <section className="home-feed">
+          {articles.length === 0 ? (
+            <div className="home-empty">
+              <p>No articles found.</p>
             </div>
+          ) : (
+            articles.map(article => (
+              <ArticleCard
+                key={article.id}
+                article={article}
+                onDelete={handleDelete}
+              />
+            ))
+          )}
+        </section>
+      </main>
 
-            <Modal
-                isOpen={modal.isOpen}
-                onClose={() =>
-                    setModal(prev => ({
-                        ...prev,
-                        isOpen: false
-                    }))
-                }
-                message={modal.message}
-                type={modal.type}
-                onConfirm={modal.onConfirm}
-            />
+      {/* Footer */}
+      <footer className="home-footer">
+        <div className="home-footer-content">
+          <div className="home-footer-left">
+            <span className="home-footer-brand">Lexicon</span>
+            <span className="home-footer-copyright">© 2024 Lexicon Scholarly Press</span>
+          </div>
+          <div className="home-footer-links">
+            <a href="#" className="home-footer-link">About</a>
+            <a href="#" className="home-footer-link">Terms</a>
+            <a href="#" className="home-footer-link">Library</a>
+          </div>
+          <div className="home-footer-social">
+            <button className="home-footer-social-btn" aria-label="RSS Feed">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16M5 20a3 3 0 1 1 6 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            <button className="home-footer-social-btn" aria-label="Email">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
         </div>
-    );
+      </footer>
+
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() =>
+          setModal(prev => ({
+            ...prev,
+            isOpen: false
+          }))
+        }
+        message={modal.message}
+        type={modal.type}
+        onConfirm={modal.onConfirm}
+      />
+    </div>
+  );
 };
 
 export default HomePage;

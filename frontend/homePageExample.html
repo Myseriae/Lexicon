@@ -1,0 +1,221 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#392510",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#0c1d2b",
+                        "outline-variant": "#c4c6cc",
+                        "secondary": "#566253",
+                        "surface-container-low": "#f4f3f2",
+                        "primary": "#051625",
+                        "inverse-primary": "#b8c8dc",
+                        "on-primary-container": "#8292a5",
+                        "surface-container": "#eeeeed",
+                        "on-secondary-fixed-variant": "#3e4a3c",
+                        "on-primary-fixed-variant": "#384858",
+                        "outline": "#74777c",
+                        "primary-fixed": "#d3e4f8",
+                        "on-tertiary-container": "#a98b6f",
+                        "on-surface-variant": "#43474c",
+                        "on-background": "#1a1c1c",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#221101",
+                        "background": "#faf9f8",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-surface": "#1a1c1c",
+                        "surface-dim": "#dadad9",
+                        "inverse-on-surface": "#f1f0f0",
+                        "tertiary-fixed-dim": "#e2c0a2",
+                        "surface-variant": "#e3e2e1",
+                        "primary-container": "#1b2b3a",
+                        "on-secondary-container": "#5a6657",
+                        "primary-fixed-dim": "#b8c8dc",
+                        "secondary-container": "#d7e3d1",
+                        "surface-tint": "#506071",
+                        "surface": "#faf9f8",
+                        "inverse-surface": "#2f3130",
+                        "surface-container-highest": "#e3e2e1",
+                        "secondary-fixed-dim": "#bdcab8",
+                        "on-tertiary-fixed-variant": "#5a422b",
+                        "secondary-fixed": "#d9e6d4",
+                        "surface-bright": "#faf9f8",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#141e13",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e9e8e7",
+                        "on-tertiary-fixed": "#291805",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffdcbe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter-desktop": "32px",
+                        "margin-mobile": "20px",
+                        "base": "8px",
+                        "margin-desktop": "64px",
+                        "reading-column-max": "720px"
+                    },
+                    "fontFamily": {
+                        "body-reading": ["EB Garamond"],
+                        "ui-label-sm": ["Inter"],
+                        "display-lg-mobile": ["EB Garamond"],
+                        "headline-md": ["EB Garamond"],
+                        "body-reading-mobile": ["EB Garamond"],
+                        "caption": ["Inter"],
+                        "ui-label-lg": ["Inter"],
+                        "display-lg": ["EB Garamond"]
+                    },
+                    "fontSize": {
+                        "body-reading": ["20px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "ui-label-sm": ["13px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "500" }],
+                        "body-reading-mobile": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "caption": ["14px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "ui-label-lg": ["16px", { "lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #faf9f8;
+            -webkit-font-smoothing: antialiased;
+        }
+        .article-divider {
+            border-bottom: 1px solid #EAE7E4;
+        }
+        .article-divider:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<nav class="bg-surface dark:bg-primary-container border-b border-outline-variant dark:border-outline docked full-width top-0 z-50">
+    <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-full">
+        <div class="flex items-center gap-8">
+            <span class="text-headline-md font-headline-md font-bold text-primary dark:text-on-primary-fixed">Lexicon</span>
+            <div class="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant">
+                <span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+                <input class="bg-transparent border-none focus:ring-0 text-ui-label-lg font-ui-label-lg w-64" placeholder="Search the library..." type="text">
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <button class="hidden md:block text-ui-label-lg font-ui-label-lg text-primary hover:bg-surface-container-low transition-colors duration-200 px-4 py-2 rounded scale-95 active:scale-90 transition-transform">Create</button>
+            <button class="text-ui-label-lg font-ui-label-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-200 px-4 py-2 rounded scale-95 active:scale-90 transition-transform">Login</button>
+            <span class="material-symbols-outlined text-primary text-[28px] cursor-pointer" data-icon="account_circle">account_circle</span>
+        </div>
+    </div>
+</nav>
+<main class="max-w-reading-column-max mx-auto px-margin-mobile md:px-0 py-16">
+    <!-- Header Section -->
+    <header class="mb-20 border-b border-outline-variant pb-10">
+        <h1 class="font-display-lg text-display-lg text-primary mb-4 md:font-display-lg md:text-display-lg font-display-lg-mobile text-display-lg-mobile">The Morning Repository</h1>
+        <p class="font-body-reading text-body-reading text-on-surface-variant max-w-xl italic">
+            A curated selection of scholarly inquiries, peer-reviewed observations, and archival deep-dives for the modern intellectual.
+        </p>
+    </header>
+    <!-- Article Feed -->
+    <section class="space-y-20">
+        <!-- Article Card 1 -->
+        <article class="article-divider pb-20 group cursor-pointer">
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="font-ui-label-sm text-ui-label-sm text-primary tracking-widest uppercase">History of Architecture</span>
+                    <span class="text-outline-variant">•</span>
+
+                </div>
+                <h2 class="font-headline-md text-headline-md text-primary group-hover:text-on-primary-container transition-colors">The Brutalist Revival: Concrete as a Medium of Social Transcendence</h2>
+                <p class="font-body-reading text-body-reading text-on-surface-variant line-clamp-3">
+                    Exploration of the mid-century architectural movement not as a cold utilitarian necessity, but as a bold statement of permanence and civic honesty in an increasingly transient world. We examine the textural depth of board-marked concrete and its psychological impact on urban density.
+                </p>
+                <div class="flex items-center justify-between mt-4">
+                    <span class="font-body-reading italic text-primary">By Dr. Julian Thorne</span>
+                    <span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+                </div>
+            </div>
+        </article>
+
+        </article>
+        <!-- Article Card 3 -->
+        <article class="article-divider pb-20 group cursor-pointer">
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="font-ui-label-sm text-ui-label-sm text-primary tracking-widest uppercase">Theoretical Physics</span>
+                    <span class="text-outline-variant">•</span>
+
+                </div>
+                <h2 class="font-headline-md text-headline-md text-primary group-hover:text-on-primary-container transition-colors">Entropy as Information: The Bibliographic Fate of the Universe</h2>
+                <p class="font-body-reading text-body-reading text-on-surface-variant line-clamp-3">
+                    A radical new interpretation of thermodynamics that treats particles as discrete units of information. If the universe is a book being written in real-time, what happens when we reach the final chapter of heat death? A contemplation on the cosmic library.
+                </p>
+                <div class="flex items-center justify-between mt-4">
+                    <span class="font-body-reading italic text-primary">By Prof. Alistair Vance</span>
+                    <span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+                </div>
+            </div>
+        </article>
+        <!-- Article Card 4 -->
+        <article class="article-divider pb-20 group cursor-pointer">
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="font-ui-label-sm text-ui-label-sm text-primary tracking-widest uppercase">Classical Philosophy</span>
+                    <span class="text-outline-variant">•</span>
+
+                </div>
+                <h2 class="font-headline-md text-headline-md text-primary group-hover:text-on-primary-container transition-colors">Stoicism in the Anthropocene: Finding Equanimity in Crisis</h2>
+                <p class="font-body-reading text-body-reading text-on-surface-variant line-clamp-3">
+                    Marcus Aurelius never faced global climate shifts, yet his meditations on the 'cosmopolis' offer a framework for individual agency amidst planetary-scale challenges. An inquiry into the virtues of restraint and communal responsibility.
+                </p>
+                <div class="flex items-center justify-between mt-4">
+                    <span class="font-body-reading italic text-primary">By Sarah Jenkins</span>
+                    <span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+                </div>
+            </div>
+        </article>
+    </section>
+
+</main>
+<!-- Footer -->
+<footer class="bg-surface dark:bg-primary-container border-t border-outline-variant dark:border-outline full-width py-12 mt-20">
+    <div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop w-full max-w-reading-column-max mx-auto">
+        <div class="flex flex-col items-center md:items-start mb-8 md:mb-0">
+            <span class="font-headline-md text-primary dark:text-on-primary-fixed mb-2">Lexicon</span>
+            <span class="font-ui-label-sm text-ui-label-sm text-on-surface-variant dark:text-on-primary-container">© 2024 Lexicon Scholarly Press</span>
+        </div>
+        <div class="flex gap-8">
+            <a class="font-ui-label-sm text-ui-label-sm text-on-surface-variant dark:text-on-primary-container hover:text-primary dark:hover:text-on-primary-fixed underline opacity-80 hover:opacity-100 transition-opacity" href="#">About</a>
+            <a class="font-ui-label-sm text-ui-label-sm text-on-surface-variant dark:text-on-primary-container hover:text-primary dark:hover:text-on-primary-fixed underline opacity-80 hover:opacity-100 transition-opacity" href="#">Terms</a>
+            <a class="font-ui-label-sm text-ui-label-sm text-on-surface-variant dark:text-on-primary-container hover:text-primary dark:hover:text-on-primary-fixed underline opacity-80 hover:opacity-100 transition-opacity" href="#">Library</a>
+        </div>
+        <div class="mt-8 md:mt-0 flex gap-4">
+            <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">rss_feed</span>
+            <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">mail</span>
+        </div>
+    </div>
+</footer>
+
+
+</body></html>

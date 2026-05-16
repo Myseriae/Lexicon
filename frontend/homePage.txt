@@ -1,0 +1,29 @@
+The Lexicon Home Page is designed as a scholarly repository, prioritizing long-form readability and structural clarity. It utilizes a minimalist "textbook" aesthetic to center the user's focus on intellectual content.
+
+Page Overview & Functionality
+Global Navigation Bar:
+
+Functionality: Provides persistent access to the search repository, content creation, and user account management.
+Design: A clean, full-width header with a subtle bottom border. The "Lexicon" brand name is set in a bold serif to establish authority. The central search bar uses a rounded field with a low-contrast border, maintaining a soft visual footprint.
+Page Header ("The Morning Repository"):
+
+Functionality: Sets the context for the current view, acting as a "masthead" for the scholarly feed.
+Design: High-contrast, large-scale EB Garamond typography. It is followed by a refined, italicized tagline and a thin horizontal divider to separate the site identity from the article feed.
+Article Cards & Feed:
+
+Functionality: Each card serves as a gateway to full academic articles, displaying metadata (category/tags), title, a brief abstract, and author attribution.
+Design: The cards are distinguished by generous vertical whitespace (margins) and very thin dividers rather than boxes or shadows. This "breathable" layout mimics the margins of a printed journal.
+Content Elements:
+
+Typography: Titles use high-contrast serif font sizes for hierarchy. Body text (summaries) uses a smaller, readable scale with open line-height to ensure legibility during scanning.
+Author Attribution: Set in small-caps or italicized labels to distinguish metadata from content.
+
+Global Footer:
+
+Functionality: Contains secondary navigational links (About, Terms, Library) and social/RSS integration.
+Design: Follows the "docked" minimalist style of the header, keeping administrative links secondary to the main reading experience.
+Design Parameters
+Typography: EB Garamond (Serif) for all headers and body copy to evoke a classic, scholarly tone. Sans-serif is reserved for functional UI labels.
+Color Palette: A "Paper White" surface (#faf9f8) to reduce glare, paired with high-contrast slate text (#1b2b3a) for optimal reading.
+Spacing System: Utilizes a "Refined Spacing" logic where separation is achieved through vertical rhythm and whitespace rather than containment, reinforcing the open, textbook feel.
+Borders: Ultra-thin (1px) and low-opacity dividers for subtle structural grounding.

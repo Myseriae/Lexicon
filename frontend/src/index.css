@@ -1,7 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@100..900&display=swap');
+
 :root {
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  font: 18px/145% var(--sans);
-  color-scheme: dark;
+  /* Design System Colors */
+  --surface: #faf9f8;
+  --surface-dim: #dadad9;
+  --surface-container-low: #f4f3f2;
+  --surface-container: #eeeeed;
+  --surface-container-high: #e9e8e7;
+  --on-surface: #1a1c1c;
+  --on-surface-variant: #43474c;
+
+  /* Primary */
+  --primary: #051625;
+  --primary-container: #1b2b3a;
+  --on-primary: #ffffff;
+  --on-primary-container: #8292a5;
+
+  /* Secondary */
+  --secondary: #566253;
+  --on-secondary: #ffffff;
+  --secondary-container: #d7e3d1;
+
+  /* Outlines */
+  --outline: #74777c;
+  --outline-variant: #c4c6cc;
+
+  /* Typography Families */
+  --font-serif: 'EB Garamond', serif;
+  --font-sans: 'Inter', sans-serif;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -14,19 +41,25 @@
 
 body {
   margin: 0;
-  background: #000;
-  color: #fff;
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-family: var(--font-serif);
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 #root {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
+  background-color: var(--surface);
 }
 
-h1, h2, h3 {
-  font-family: var(--sans);
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
   font-weight: 500;
+  color: var(--primary-container);
+  margin: 0;
 }
 
 p {

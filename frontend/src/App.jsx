@@ -4,7 +4,6 @@ import { useState } from 'react';
 import HomePage from './pages/HomePage';
 import CreatePage from './pages/CreatePage';
 import Navbar from './components/Navbar.jsx';
-import LightRays from './components/LightRays/LightRays';
 import ArticlePage from './pages/ArticlePage';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
@@ -15,19 +14,6 @@ function App() {
   return (
     <Router>
       <div className="app-container">
-        <div className="app-background">
-          <LightRays
-            raysOrigin="top-center"
-            raysColor="#00ffff"
-            raysSpeed={1.5}
-            lightSpread={0.8}
-            rayLength={1.2}
-            followMouse={true}
-            mouseInfluence={0.1}
-            noiseAmount={0.1}
-            distortion={0.05}
-          />
-        </div>
 
         <div className="app-content">
           <Navbar onSearch={setSearchQuery} />
