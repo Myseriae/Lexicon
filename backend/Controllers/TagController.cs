@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Lexicon.Controllers;
 
 [ApiController]
+[Route("api")]
 public class TagController : ControllerBase
 {
     private readonly ITagRepository _tagRepository;
@@ -16,7 +17,7 @@ public class TagController : ControllerBase
         _tagRepository = tagRepository;
     }
 
-    [HttpGet("api/tags")]
+    [HttpGet("tags")]
     public async Task<ActionResult<IEnumerable<Tag>>> GetTags()
     {
         var tags = await _tagRepository.GetAllAsync();
