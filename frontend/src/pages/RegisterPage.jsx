@@ -49,7 +49,8 @@ const RegisterPage = () => {
   return (
     <div className="register-container">
       <div className="register-box">
-        <h1>Register</h1>
+        <h1>Join Lexicon</h1>
+        <p>Create your account to contribute to our scholarly community and access curated intellectual discourse.</p>
 
         {error && <div className="error-message">{error}</div>}
 

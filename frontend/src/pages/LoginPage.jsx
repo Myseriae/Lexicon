@@ -16,7 +16,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await login(email, password);
+      await login(email, password);
       // Token is automatically stored in localStorage by login()
       // Redirect to home page or previous page
       navigate('/');
@@ -30,7 +30,8 @@ const LoginPage = () => {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h1>Login</h1>
+        <h1>Welcome Back</h1>
+        <p>Sign in to access your scholarly library and continue your intellectual journey.</p>
 
         {error && <div className="error-message">{error}</div>}
 
@@ -67,7 +68,7 @@ const LoginPage = () => {
         </form>
 
         <p className="signup-link">
-          Don't have an account? <a href="/register">Sign up here</a>
+          Don't have an account? <a href="/register">Create one here</a>
         </p>
       </div>
     </div>

@@ -1,26 +1,43 @@
+/* Login Page - Scholarly Minimalist Design */
+
 .login-container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   padding: 2rem;
+  background-color: var(--surface);
+  margin-top: 0;
 }
 
 .login-box {
-  background-color: rgba(27, 23, 34, 0.9);
-  border: 1px solid rgba(0, 207, 255, 0.3);
-  border-radius: 8px;
-  padding: 2rem;
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: 0.25rem;
+  padding: 2.5rem;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0, 207, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(5, 22, 37, 0.08);
 }
 
 .login-box h1 {
-  color: #fff;
+  font-family: var(--font-serif);
+  color: var(--primary-container);
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.login-box > p {
+  font-family: var(--font-serif);
+  color: var(--on-surface-variant);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.6;
 }
 
 .form-group {
@@ -29,30 +46,40 @@
 
 .form-group label {
   display: block;
-  color: #00cfff;
+  font-family: var(--font-sans);
+  color: var(--primary-container);
   margin-bottom: 0.5rem;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  background-color: #222;
-  border: 1px solid #444;
-  color: #fff;
-  border-radius: 4px;
+  background-color: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  color: var(--on-surface);
+  border-radius: 0.25rem;
+  font-family: var(--font-serif);
   font-size: 1rem;
-  transition: border-color 0.3s;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-group input::placeholder {
+  color: var(--on-surface-variant);
+  opacity: 0.7;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #00cfff;
-  box-shadow: 0 0 5px rgba(0, 207, 255, 0.3);
+  border-color: var(--primary-container);
+  background-color: var(--surface-container-lowest);
 }
 
 .form-group input:disabled {
-  background-color: #1a1a1a;
+  background-color: var(--surface-container);
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -60,18 +87,26 @@
 .login-btn {
   width: 100%;
   padding: 0.75rem;
-  background-color: #00cfff;
+  background-color: var(--primary-container);
   border: none;
-  color: #000;
-  font-weight: bold;
-  border-radius: 4px;
+  color: var(--on-primary);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
+  border-radius: 0.25rem;
   cursor: pointer;
-  font-size: 1rem;
-  transition: opacity 0.3s;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  margin-top: 0.5rem;
 }
 
 .login-btn:hover:not(:disabled) {
-  opacity: 0.9;
+  background-color: var(--primary);
+  opacity: 0.95;
+}
+
+.login-btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .login-btn:disabled {
@@ -79,31 +114,46 @@
   cursor: not-allowed;
 }
 
+.login-btn:focus {
+  outline: 2px solid var(--primary-container);
+  outline-offset: 2px;
+}
+
 .error-message {
-  background-color: rgba(255, 77, 77, 0.1);
-  border: 1px solid #ff4d4d;
-  color: #ff4d4d;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+  background-color: rgba(186, 26, 26, 0.08);
+  border: 1px solid rgba(186, 26, 26, 0.3);
+  color: var(--error);
+  padding: 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1.5rem;
   text-align: center;
+  font-family: var(--font-serif);
+  font-size: 0.9375rem;
 }
 
 .signup-link {
   text-align: center;
-  color: #999;
+  color: var(--on-surface-variant);
   margin-top: 1.5rem;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  font-family: var(--font-serif);
 }
 
 .signup-link a {
-  color: #00cfff;
-  text-decoration: none;
+  color: var(--primary-container);
+  text-decoration: underline;
   font-weight: 500;
-  transition: opacity 0.3s;
+  transition: opacity 0.2s ease, color 0.2s ease;
 }
 
 .signup-link a:hover {
   opacity: 0.8;
+  color: var(--primary);
+}
+
+.signup-link a:focus {
+  outline: 2px solid var(--primary-container);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 

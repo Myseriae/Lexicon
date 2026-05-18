@@ -7,6 +7,8 @@
   --surface-container-low: #f4f3f2;
   --surface-container: #eeeeed;
   --surface-container-high: #e9e8e7;
+  --surface-container-lowest: #ffffff;
+  --surface-container-highest: #e3e2e1;
   --on-surface: #1a1c1c;
   --on-surface-variant: #43474c;
 
@@ -20,6 +22,12 @@
   --secondary: #566253;
   --on-secondary: #ffffff;
   --secondary-container: #d7e3d1;
+
+  /* Error */
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
 
   /* Outlines */
   --outline: #74777c;
