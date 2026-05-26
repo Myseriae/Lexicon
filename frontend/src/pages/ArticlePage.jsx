@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getArticle, updateArticle, deleteArticle, getCollaborators } from '../api/api';
-import { getCurrentUser } from '../utils/jwtUtils';
 import Modal from '../components/Modal/Modal';
 import Collaborators from '../components/Collaborators/Collaborators';
 import MDEditor from '@uiw/react-md-editor';
 import ReactMarkdown from 'react-markdown';
 import '@uiw/react-md-editor/markdown-editor.css';
 import './ArticlePage.css';
+import { useAuth } from '../context/AuthContext';
 
 const ArticlePage = () => {
   const { id } = useParams();
@@ -22,6 +22,7 @@ const ArticlePage = () => {
   const [canEdit, setCanEdit] = useState(false);
   const [collaborators, setCollaborators] = useState([]);
   const navigate = useNavigate();
+  const { currentUser: authenticatedUser } = useAuth();
 
   // Fetch collaborators
   const fetchCollaborators = async () => {
@@ -42,8 +43,7 @@ const ArticlePage = () => {
         setFormData({ title: data.title, content: data.content, summary: data.summary || '' });
 
         // Fetch collaborators if the user is logged in
-        const user = getCurrentUser();
-        if (user) {
+        if (authenticatedUser) {
           const collabData = await getCollaborators(id);
           setCollaborators(collabData);
         }
@@ -53,13 +53,11 @@ const ArticlePage = () => {
     };
 
     fetchArticleAndCollaborators();
-  }, [id]);
+  }, [authenticatedUser, id]);
 
-  // Get current user on component mount
   useEffect(() => {
-    const user = getCurrentUser();
-    setCurrentUser(user);
-  }, []);
+    setCurrentUser(authenticatedUser);
+  }, [authenticatedUser]);
 
   // Check permissions when article or user changes
   useEffect(() => {

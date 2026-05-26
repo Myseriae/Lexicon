@@ -11,14 +11,19 @@ namespace Lexicon.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly ILogger<AuthController> _logger;
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
 
     private const string RefreshTokenCookieName = "refreshToken";
 
-    public AuthController(IAuthService authService, ILogger<AuthController> logger)
+    public AuthController(
+        IAuthService authService,
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
         _authService = authService;
-        _logger      = logger;
+        _configuration = configuration;
+        _environment = environment;
     }
 
     // -------------------------------------------------------------------------
@@ -95,7 +100,10 @@ public class AuthController : ControllerBase
         var result = await _authService.RefreshAsync(incomingToken);
 
         if (!result.Success)
+        {
+            ClearRefreshTokenCookie();
             return Unauthorized("Refresh token is invalid or expired. Please log in again.");
+        }
 
         SetRefreshTokenCookie(result.RefreshToken);
 
@@ -120,13 +128,7 @@ public class AuthController : ControllerBase
         if (!string.IsNullOrEmpty(incomingToken))
             await _authService.LogoutAsync(incomingToken);
 
-        // Always clear the cookie regardless of whether we found the token in DB.
-        Response.Cookies.Delete(RefreshTokenCookieName, new CookieOptions
-        {
-            Path     = "/api/auth/refresh",
-            SameSite = SameSiteMode.Strict,
-            Secure   = false
-        });
+        ClearRefreshTokenCookie();
 
         return NoContent();
     }
@@ -163,19 +165,36 @@ public class AuthController : ControllerBase
     // -------------------------------------------------------------------------
 
     /// <summary>
-    /// Writes the refresh token as an httpOnly cookie restricted to /api/auth/refresh.
+    /// Writes the refresh token as an httpOnly cookie for auth endpoints.
     /// </summary>
     private void SetRefreshTokenCookie(string refreshToken)
     {
-        var options = new CookieOptions
-        {
-            HttpOnly = true,                          // JS cannot read this
-            Secure   = false,                          // HTTPS only — set false for local HTTP dev
-            SameSite = SameSiteMode.Strict,           // not sent cross-site (CSRF protection)
-            Path     = "/api/auth/refresh",           // cookie only sent to this path
-            Expires  = DateTimeOffset.UtcNow.AddDays(7)
-        };
+        Response.Cookies.Append(
+            RefreshTokenCookieName,
+            refreshToken,
+            CreateRefreshTokenCookieOptions());
+    }
 
-        Response.Cookies.Append(RefreshTokenCookieName, refreshToken, options);
+    private void ClearRefreshTokenCookie()
+    {
+        Response.Cookies.Delete(
+            RefreshTokenCookieName,
+            CreateRefreshTokenCookieOptions(DateTimeOffset.UtcNow.AddDays(-1)));
+    }
+
+    private CookieOptions CreateRefreshTokenCookieOptions(DateTimeOffset? expires = null)
+    {
+        var expirationDays = int.TryParse(
+            _configuration["Jwt:RefreshTokenExpirationDays"], out var days) ? days : 7;
+        var isDevelopment = _environment.IsDevelopment();
+
+        return new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = !isDevelopment,
+            SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
+            Path = "/api/auth",
+            Expires = expires ?? DateTimeOffset.UtcNow.AddDays(expirationDays)
+        };
     }
 }

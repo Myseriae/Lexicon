@@ -101,7 +101,8 @@ public class AuthService : IAuthService
             user.Email!,
             user.UserName!,
             role
-        );    }
+        );
+    }
 
     // -------------------------------------------------------------------------
     // Refresh — validates old token, rotates it, issues new access token
@@ -132,7 +133,14 @@ public class AuthService : IAuthService
         var newRefresh   = await CreateAndStoreRefreshTokenAsync(user.Id);
 
         _logger.LogInformation("Tokens rotated for user '{UserId}'.", user.Id);
-        return new AuthResult(true, user.Email!, user.UserName!, role, newAccess, newRefresh);
+
+        return new AuthResult(
+            true,
+            newAccess,
+            newRefresh,
+            user.Email!,
+            user.UserName!,
+            role);
     }
 
     // -------------------------------------------------------------------------
