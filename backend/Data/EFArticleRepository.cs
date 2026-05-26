@@ -87,10 +87,8 @@ public class EFArticleRepository : IArticleRepository
 
         return await _context.Articles
             .Include(a => a.Tags)
-            .Where(a =>
-                EF.Functions.Like(a.Title, pattern) ||
-                EF.Functions.Like(a.Content, pattern) ||
-                a.Tags.Any(t => EF.Functions.Like(t.Name, pattern)))
+            // Search only in article titles
+            .Where(a => EF.Functions.Like(a.Title, pattern))
             .ToListAsync();
     }
 

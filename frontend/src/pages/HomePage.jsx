@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getArticles, deleteArticle } from '../api/api';
+import { getArticles, searchArticles, deleteArticle } from '../api/api';
 import SpotlightCard from '../components/SpotlightCard/SpotlightCard';
 import Modal from '../components/Modal/Modal';
 import './HomePage.css';
@@ -20,13 +20,21 @@ const HomePage = () => {
     const [searchParams] = useSearchParams();
 
     const tag = searchParams.get('tag');
+    const search = searchParams.get('search');
 
     useEffect(() => {
         const fetchArticles = async () => {
             try {
                 setLoading(true);
 
-                const data = await getArticles(tag);
+                let data;
+                if (search && search.trim()) {
+                    data = await searchArticles(search);
+                } else if (tag) {
+                    data = await getArticles(tag);
+                } else {
+                    data = await getArticles();
+                }
 
                 setArticles(data);
             } catch (err) {
@@ -37,7 +45,7 @@ const HomePage = () => {
         };
 
         fetchArticles();
-    }, [tag]);
+    }, [tag, search]);
 
     const handleDelete = async (id) => {
         setModal({
