@@ -5,6 +5,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C9132B72-A953-48E0-ABB3-1EE3C9C82992}"
 	ProjectSection(SolutionItems) = preProject
 		compose.yaml = compose.yaml
+		.env = .env
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexiconTest", "LexiconTest\LexiconTest.csproj", "{92F1A01C-A037-4CB8-98F3-AF924784D6B3}"

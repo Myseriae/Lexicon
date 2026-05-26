@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../api/authApi';
+import { useAuth } from '../context/AuthContext';
 import './RegisterPage.css';
 
 const RegisterPage = () => {
@@ -11,6 +11,7 @@ const RegisterPage = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -36,8 +37,6 @@ const RegisterPage = () => {
         email,
         password,
       });
-      // Token is automatically stored in localStorage by register()
-      // Redirect to home page
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -120,4 +119,3 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
-

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { isAuthenticated, logout } from '../api/authApi';
+import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 const Navbar = ({ onSearch }) => {
   const navigate = useNavigate();
-  const loggedIn = isAuthenticated();
   const [searchValue, setSearchValue] = useState('');
+  const { isAuthenticated, isInitializing, logout } = useAuth();
 
   // When user submits search (Enter or button), navigate to home with search param
   const handleSearch = () => {
@@ -24,15 +24,15 @@ const Navbar = ({ onSearch }) => {
   };
 
   const handleCreateClick = () => {
-    if (loggedIn) {
+    if (isAuthenticated) {
       navigate('/create');
     } else {
       navigate('/register');
     }
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 
@@ -96,11 +96,11 @@ const Navbar = ({ onSearch }) => {
       </div>
 
       <div className="navbar-right">
-        {loggedIn ? (
+        {isAuthenticated ? (
           <button className="logout-button" onClick={handleLogout}>
             Logout
           </button>
-        ) : (
+        ) : !isInitializing ? (
           <>
             <Link to="/login" className="login-button">
               Login
@@ -109,7 +109,7 @@ const Navbar = ({ onSearch }) => {
               Register
             </Link>
           </>
-        )}
+        ) : null}
       </div>
     </nav>
   );

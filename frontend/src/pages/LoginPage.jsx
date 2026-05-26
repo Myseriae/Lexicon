@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../api/authApi';
+import { useAuth } from '../context/AuthContext';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -9,6 +9,7 @@ const LoginPage = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,9 +17,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await login(email, password);
-      // Token is automatically stored in localStorage by login()
-      // Redirect to home page or previous page
+      await login(email, password);
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -75,4 +74,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-

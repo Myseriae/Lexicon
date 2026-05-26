@@ -1,94 +1,54 @@
-import { getToken } from '../utils/jwtUtils';
-
-const API_BASE_URL = '';
-
-const fetchWrapper = async (url, options = {}) => {
-    try {
-        const headers = {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        };
-
-        // Add authorization token if available
-        const token = getToken();
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        const response = await fetch(`${API_BASE_URL}${url}`, {
-            headers,
-            ...options,
-        });
-
-        const contentType = response.headers.get('content-type');
-
-        let data = null;
-        if (contentType && contentType.includes('application/json')) {
-            data = await response.json();
-        }
-
-        if (!response.ok) {
-            throw new Error(
-                data?.message || `Request failed with status ${response.status}`
-            );
-        }
-
-        return data;
-    } catch (error) {
-        // Network error or unexpected crash
-        throw new Error(error.message || 'Network error occurred');
-    }
-};
+import { requestJson } from './httpClient';
 
 export const getArticles = (tag) => {
     const url = tag
         ? `/api/articles?tag=${encodeURIComponent(tag)}`
         : '/api/articles';
 
-    return fetchWrapper(url);
+    return requestJson(url);
 };
 
 export const getArticle = (id) => {
-    return fetchWrapper(`/api/articles/${id}`);
+    return requestJson(`/api/articles/${id}`);
 };
 
 export const createArticle = (article) => {
-    return fetchWrapper('/api/articles', {
+    return requestJson('/api/articles', {
         method: 'POST',
         body: JSON.stringify(article),
     });
 };
 
 export const updateArticle = (id, article) => {
-    return fetchWrapper(`/api/articles/${id}`, {
+    return requestJson(`/api/articles/${id}`, {
         method: 'PUT',
         body: JSON.stringify(article),
     });
 };
 
 export const deleteArticle = (id) => {
-    return fetchWrapper(`/api/articles/${id}`, {
+    return requestJson(`/api/articles/${id}`, {
         method: 'DELETE',
     });
 };
 
 export const searchArticles = (query) => {
-    return fetchWrapper(`/api/articles/search?query=${encodeURIComponent(query)}`);
+    return requestJson(`/api/articles/search?query=${encodeURIComponent(query)}`);
 };
 
 // Collaborator endpoints
 export const getCollaborators = (articleId) => {
-    return fetchWrapper(`/api/articles/${articleId}/collaborators`);
+    return requestJson(`/api/articles/${articleId}/collaborators`);
 };
 
 export const addCollaborator = (articleId, userId) => {
-    return fetchWrapper(`/api/articles/${articleId}/collaborators/${userId}`, {
+    return requestJson(`/api/articles/${articleId}/collaborators/${userId}`, {
         method: 'POST',
     });
 };
 
 export const addCollaboratorByUsername = (articleId, username) => {
-    return fetchWrapper(
+    return requestJson(
         `/api/articles/${articleId}/collaborators/by-username/${encodeURIComponent(username)}`,
         {
             method: 'POST',
@@ -97,29 +57,29 @@ export const addCollaboratorByUsername = (articleId, username) => {
 };
 
 export const removeCollaborator = (articleId, userId) => {
-    return fetchWrapper(`/api/articles/${articleId}/collaborators/${userId}`, {
+    return requestJson(`/api/articles/${articleId}/collaborators/${userId}`, {
         method: 'DELETE',
     });
 };
 
 export const isCollaborator = (articleId, userId) => {
-    return fetchWrapper(`/api/articles/${articleId}/collaborators/${userId}/is-collaborator`);
+    return requestJson(`/api/articles/${articleId}/collaborators/${userId}/is-collaborator`);
 };
 
 // tag endpoints
 export const getTags = () => {
-    return fetchWrapper('/api/tags');
+    return requestJson('/api/tags');
 };
 
 export const addTagToArticle = (articleId, name) => {
-    return fetchWrapper(`/api/articles/${articleId}/tags`, {
+    return requestJson(`/api/articles/${articleId}/tags`, {
         method: 'POST',
         body: JSON.stringify({ name }),
     });
 };
 
 export const removeTagFromArticle = (articleId, tagId) => {
-    return fetchWrapper(`/api/articles/${articleId}/tags/${tagId}`, {
+    return requestJson(`/api/articles/${articleId}/tags/${tagId}`, {
         method: 'DELETE',
     });
 };
