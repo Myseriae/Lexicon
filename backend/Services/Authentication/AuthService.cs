@@ -211,7 +211,7 @@ public class AuthService : IAuthService
 
     private static AuthResult Fail(string email, string errorDescription)
     {
-        var result = new AuthResult(false, email, string.Empty, string.Empty, string.Empty, string.Empty);
+        var result = new AuthResult(false, string.Empty, string.Empty, email, string.Empty, string.Empty);
         result.ErrorMessages["AuthError"] = errorDescription;
         return result;
     }
