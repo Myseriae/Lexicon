@@ -19,4 +19,10 @@ public class EFRevisionRepository : IRevisionRepository
             .OrderBy(r => r.VersionNumber)
             .ToListAsync();
     }
+
+    public async Task AddRevisionAsync(Revision revision)
+    {
+        _context.Revisions.Add(revision);
+        await _context.SaveChangesAsync();
+    }
 }
