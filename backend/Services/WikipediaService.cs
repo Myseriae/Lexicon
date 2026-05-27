@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace Lexicon.Services;
 
@@ -30,7 +31,12 @@ public class WikipediaService : IWikipediaService
             if (!response.IsSuccessStatusCode)
                 return null;
 
-            var data = await response.Content.ReadFromJsonAsync<WikipediaResponse>();
+            var data = JsonSerializer.Deserialize<WikipediaResponse>(
+                body,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
 
             Console.WriteLine($"Extract: {data?.Extract}");
 
