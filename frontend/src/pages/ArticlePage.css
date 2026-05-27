@@ -116,6 +116,29 @@
   padding: 0;
   min-height: 150px;
   resize: vertical;
+  /* Supply dark-mode prettylights token variables directly on the editor root so
+     the Prism token color rules inside .w-md-editor-text-pre resolve to visible
+     light colors instead of the near-black light-mode fallbacks. */
+  --color-fg-default: #ccc;
+  --color-canvas-default: #222;
+  --color-border-default: #444;
+  --color-prettylights-syntax-comment: #8b949e;
+  --color-prettylights-syntax-constant: #79c0ff;
+  --color-prettylights-syntax-entity: #d2a8ff;
+  --color-prettylights-syntax-storage-modifier-import: #c9d1d9;
+  --color-prettylights-syntax-entity-tag: #7ee787;
+  --color-prettylights-syntax-keyword: #ff7b72;
+  --color-prettylights-syntax-string: #a5d6ff;
+  --color-prettylights-syntax-variable: #ffa657;
+  --color-prettylights-syntax-markup-bold: #c9d1d9;
+  --color-prettylights-syntax-markup-italic: #c9d1d9;
+  --color-prettylights-syntax-markup-heading: #1f6feb;
+  --color-prettylights-syntax-markup-list: #f2cc60;
+  --color-prettylights-syntax-markup-deleted-text: #ffdcd7;
+  --color-prettylights-syntax-markup-inserted-text: #aff5b4;
+  --color-prettylights-syntax-markup-changed-text: #ffdfb6;
+  --color-prettylights-syntax-meta-diff-range: #d2a8ff;
+  --color-prettylights-syntax-constant-other-reference-link: #a5d6ff;
 }
 
 .textarea.w-md-editor:focus-within {
