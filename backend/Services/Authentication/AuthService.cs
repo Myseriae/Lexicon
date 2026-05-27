@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using Lexicon.Data;
 using Lexicon.Model;
 using Lexicon.Services.Authentication;
@@ -11,22 +11,22 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly ITokenService _tokenService;
-    private readonly LexiconDbContext _context;
+    private readonly IRefreshTokenRepository _refreshTokenRepo;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         UserManager<IdentityUser> userManager,
         ITokenService tokenService,
-        LexiconDbContext context,
+        IRefreshTokenRepository refreshTokenRepo,
         IConfiguration configuration,
         ILogger<AuthService> logger)
     {
-        _userManager   = userManager;
-        _tokenService  = tokenService;
-        _context       = context;
-        _configuration = configuration;
-        _logger        = logger;
+        _userManager       = userManager;
+        _tokenService      = tokenService;
+        _refreshTokenRepo  = refreshTokenRepo;
+        _configuration     = configuration;
+        _logger            = logger;
     }
 
     // -------------------------------------------------------------------------
@@ -46,7 +46,7 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
         {
             var failure = new AuthResult(false, "", "", email, username, "");
-        
+
             foreach (var error in result.Errors)
                 failure.ErrorMessages[error.Code] = error.Description;
 
@@ -87,13 +87,15 @@ public class AuthService : IAuthService
         if (!passwordValid)
             return Fail(email, "Bad credentials");
 
+        await _refreshTokenRepo.DeleteExpiredAndRevokedAsync(user.Id);
+
         var roles      = await _userManager.GetRolesAsync(user);
         var role       = roles.FirstOrDefault() ?? string.Empty;
         var accessToken  = _tokenService.CreateAccessToken(user, role);
         var refreshToken = await CreateAndStoreRefreshTokenAsync(user.Id);
 
         _logger.LogInformation("User '{UserName}' logged in.", user.UserName);
-        
+
         return new AuthResult(
             true,
             accessToken,
@@ -110,8 +112,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResult> RefreshAsync(string incomingRefreshToken)
     {
-        var stored = await _context.RefreshTokens
-            .FirstOrDefaultAsync(t => t.Token == incomingRefreshToken);
+        var stored = await _refreshTokenRepo.GetByTokenAsync(incomingRefreshToken);
 
         if (stored is null || stored.IsRevoked || stored.ExpiresAt < DateTime.UtcNow)
         {
@@ -120,8 +121,7 @@ public class AuthService : IAuthService
         }
 
         // Revoke the used token immediately (rotation — prevents reuse).
-        stored.IsRevoked = true;
-        await _context.SaveChangesAsync();
+        await _refreshTokenRepo.RevokeAsync(stored);
 
         var user = await _userManager.FindByIdAsync(stored.UserId);
         if (user is null)
@@ -150,14 +150,12 @@ public class AuthService : IAuthService
     /// <summary>Revokes the refresh token so it can no longer be used.</summary>
     public async Task<bool> LogoutAsync(string incomingRefreshToken)
     {
-        var stored = await _context.RefreshTokens
-            .FirstOrDefaultAsync(t => t.Token == incomingRefreshToken);
+        var stored = await _refreshTokenRepo.GetByTokenAsync(incomingRefreshToken);
 
         if (stored is null || stored.IsRevoked)
             return false;
 
-        stored.IsRevoked = true;
-        await _context.SaveChangesAsync();
+        await _refreshTokenRepo.RevokeAsync(stored);
 
         _logger.LogInformation("Refresh token revoked for user '{UserId}'.", stored.UserId);
         return true;
@@ -175,6 +173,14 @@ public class AuthService : IAuthService
     {
         var user = await _userManager.FindByIdAsync(userId);
         return user?.UserName;
+    }
+
+    public async Task<Dictionary<string, string>> GetUsernamesByIdsAsync(IEnumerable<string> userIds)
+    {
+        var ids = userIds.Distinct().ToList();
+        return await _userManager.Users
+            .Where(u => ids.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u.UserName ?? u.Id);
     }
 
     // -------------------------------------------------------------------------
@@ -203,8 +209,7 @@ public class AuthService : IAuthService
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.RefreshTokens.Add(refreshToken);
-        await _context.SaveChangesAsync();
+        await _refreshTokenRepo.AddAsync(refreshToken);
 
         return tokenString;
     }
