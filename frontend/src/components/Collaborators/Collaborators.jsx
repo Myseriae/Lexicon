@@ -5,7 +5,7 @@ import './Collaborators.css';
 const Collaborators = ({
   articleId,
   collaborators = [],
-  authorId,
+  authorUsername,
   isAuthor,
   onCollaboratorAdded,
   onCollaboratorRemoved
@@ -78,7 +78,7 @@ const Collaborators = ({
         {/* Show Author */}
         <div className="collaborator-item">
           <span className="collaborator-info">
-            <span className="collaborator-name">{authorId}</span>
+            <span className="collaborator-name">{authorUsername}</span>
             <span className="collaborator-badge author-badge">Author</span>
           </span>
         </div>
@@ -88,7 +88,6 @@ const Collaborators = ({
           <div key={collaborator.userId} className="collaborator-item">
             <span className="collaborator-info">
               <span className="collaborator-name">{collaborator.userName}</span>
-              <span className="collaborator-id">({collaborator.userId})</span>
             </span>
 
             {isAuthor && (
