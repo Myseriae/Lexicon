@@ -41,7 +41,6 @@ public class ArticleService : IArticleService
         return new ArticleResponse
         {
             Id = article.Id,
-            AuthorId = article.AuthorId,
             AuthorUsername = authorUsername,
             Title = article.Title,
             Content = article.Content,
@@ -62,7 +61,6 @@ public class ArticleService : IArticleService
         return new ArticleResponse
         {
             Id = article.Id,
-            AuthorId = article.AuthorId,
             AuthorUsername = authorUsername,
             Title = article.Title,
             Content = article.Content,
