@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+// Load .env (for local dev without Docker). Does not override vars already set by the OS/Docker.
+DotNetEnv.Env.NoClobber().TraversePath().Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -47,9 +50,17 @@ builder.Services.AddCors(options =>
 });
 
 // --- Database ---
+// Substitute {SA_PASSWORD} placeholder in the connection string with the value from
+// the environment (set by .env locally or by Docker Compose in production).
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                       ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is missing.");
+var saPassword = builder.Configuration["SA_PASSWORD"]
+                 ?? throw new InvalidOperationException(
+                     "SA_PASSWORD is missing. Add it to .env or set it as an environment variable.");
+connectionString = connectionString.Replace("{SA_PASSWORD}", saPassword);
+
 builder.Services.AddDbContext<LexiconDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString));
 
 // --- JWT Authentication ---
 AddAuthentication();

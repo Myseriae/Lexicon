@@ -3,13 +3,13 @@
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "Mystrongpassword0"
+      SA_PASSWORD: "${SA_PASSWORD}"
     ports:
       - "1433:1433"
     volumes:
       - mssqldata:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Mystrongpassword0 -Q 'SELECT 1' -No || exit 1"]
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -Q 'SELECT 1' -No || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 10
@@ -24,7 +24,8 @@
     environment:
       - Jwt__IssuerSigningKey=${JWT_SIGNING_KEY}
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=Lexicon;User Id=sa;Password=Mystrongpassword0;TrustServerCertificate=True
+      - SA_PASSWORD=${SA_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=Lexicon;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
     depends_on:
       db:
         condition: service_healthy
