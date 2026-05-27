@@ -19,6 +19,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IArticleRepository, EFArticleRepository>();
 builder.Services.AddScoped<IRevisionRepository, EFRevisionRepository>();
 builder.Services.AddScoped<ITagRepository, EFTagRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, EFRefreshTokenRepository>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
 builder.Services.AddHttpClient<IWikipediaService, WikipediaService>(client =>
 {
