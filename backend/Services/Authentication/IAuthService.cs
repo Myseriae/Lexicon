@@ -21,4 +21,6 @@ public interface IAuthService
 
     /// <summary>Finds a user by ID and returns their username.</summary>
     Task<string?> GetUsernameByIdAsync(string userId);
+
+    Task<Dictionary<string, string>> GetUsernamesByIdsAsync(IEnumerable<string> userIds);
 }
