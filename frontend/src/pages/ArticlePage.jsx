@@ -169,12 +169,14 @@ const ArticlePage = () => {
             placeholder="Summary"
             disabled={saving}
           />
-          <MDEditor
-            value={formData.content}
-            onChange={(value) => setFormData({ ...formData, content: value || '' })}
-            className="textarea"
-            data-color-mode="dark"
-          />
+          {article && (
+            <MDEditor
+              value={formData.content}
+              onChange={(value) => setFormData({ ...formData, content: value || '' })}
+              className="textarea"
+              data-color-mode="dark"
+            />
+          )}
 
           <div className="article-actions">
             <button onClick={handleUpdate} disabled={saving} className="btn">
