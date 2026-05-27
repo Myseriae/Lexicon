@@ -8,6 +8,7 @@ import LightRays from './components/LightRays/LightRays';
 import ArticlePage from './pages/ArticlePage';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,7 +36,7 @@ function App() {
           <div className="app-routes-container">
             <Routes>
               <Route path="/" element={<HomePage searchQuery={searchQuery} />} />
-              <Route path="/create" element={<CreatePage />} />
+              <Route path="/create" element={<ProtectedRoute><CreatePage /></ProtectedRoute>} />
               <Route path="/article/:id" element={<ArticlePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
