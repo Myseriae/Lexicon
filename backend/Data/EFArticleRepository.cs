@@ -54,24 +54,10 @@ public class EFArticleRepository : IArticleRepository
         return true;
     }
 
-    public async Task<bool> UpdateArticleAsync(int id, Article article, string previousContent, string? summary = null)
+    public async Task<bool> UpdateArticleAsync(int id, Article article)
     {
         var existing = await _context.Articles.FindAsync(id);
         if (existing == null) return false;
-
-        var revisionCount = await _context.Revisions
-            .CountAsync(r => r.ArticleId == id);
-
-        var revision = new Revision
-        {
-            ArticleId = id,
-            Content = previousContent,
-            Summary = summary,
-            VersionNumber = revisionCount + 1,
-            SavedAt = DateTime.UtcNow
-        };
-
-        _context.Revisions.Add(revision);
 
         existing.Title = article.Title;
         existing.Content = article.Content;
