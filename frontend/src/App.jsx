@@ -1,6 +1,5 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
 import HomePage from './pages/HomePage';
 import CreatePage from './pages/CreatePage';
 import Navbar from './components/Navbar.jsx';
@@ -11,8 +10,6 @@ import RegisterPage from './pages/RegisterPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  const [searchQuery, setSearchQuery] = useState('');
-
   return (
     <Router>
       <div className="app-container">
@@ -31,11 +28,11 @@ function App() {
         </div>
 
         <div className="app-content">
-          <Navbar onSearch={setSearchQuery} />
+          <Navbar />
 
           <div className="app-routes-container">
             <Routes>
-              <Route path="/" element={<HomePage searchQuery={searchQuery} />} />
+              <Route path="/" element={<HomePage />} />
               <Route path="/create" element={<ProtectedRoute><CreatePage /></ProtectedRoute>} />
               <Route path="/article/:id" element={<ArticlePage />} />
               <Route path="/login" element={<LoginPage />} />
