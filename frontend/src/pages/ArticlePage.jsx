@@ -62,7 +62,7 @@ const ArticlePage = () => {
   // Check permissions when article or user changes
   useEffect(() => {
     if (article && currentUser) {
-      const isAuthor = currentUser.id === article.authorId;
+      const isAuthor = article.authorUsername === currentUser.name;
       const isAdmin = currentUser.role === 'Admin';
       const isCollaborator = article.collaboratorIds && article.collaboratorIds.includes(currentUser.id);
 
@@ -146,8 +146,8 @@ const ArticlePage = () => {
             <Collaborators
               articleId={article.id}
               collaborators={collaborators}
-              authorId={article.authorId}
-              isAuthor={currentUser.id === article.authorId}
+              authorUsername={article.authorUsername}
+              isAuthor={article.authorUsername === currentUser.name}
               onCollaboratorAdded={fetchCollaborators}
               onCollaboratorRemoved={fetchCollaborators}
             />
