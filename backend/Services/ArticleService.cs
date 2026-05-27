@@ -75,15 +75,26 @@ public class ArticleService : IArticleService
         };
     }
 
+    private ArticleResponse ToResponse(Article article, Dictionary<string, string> usernameMap)
+    {
+        return new ArticleResponse
+        {
+            Id = article.Id,
+            AuthorUsername = usernameMap.GetValueOrDefault(article.AuthorId, article.AuthorId),
+            Title = article.Title,
+            Content = article.Content,
+            Summary = article.Summary,
+            Created = article.Created,
+            Tags = article.Tags?.Select(t => new TagResponse { Id = t.Id, Name = t.Name }).ToList() ?? new List<TagResponse>(),
+            CollaboratorIds = article.Collaborators?.Select(c => c.UserId).ToList() ?? new List<string>()
+        };
+    }
+
     public async Task<IEnumerable<ArticleResponse>> GetArticlesAsync(string? tag = null)
     {
-        var articles = await _articleRepository.GetArticlesAsync(tag);
-        var responses = new List<ArticleResponse>();
-        foreach (var article in articles ?? new List<Article>())
-        {
-            responses.Add(await ToResponseAsync(article));
-        }
-        return responses;
+        var articles = (await _articleRepository.GetArticlesAsync(tag) ?? new List<Article>()).ToList();
+        var usernameMap = await _authService.GetUsernamesByIdsAsync(articles.Select(a => a.AuthorId));
+        return articles.Select(a => ToResponse(a, usernameMap)).ToList();
     }
 
     public async Task<ArticleResponse?> GetArticleByIdAsync(int id)
@@ -164,7 +175,18 @@ public class ArticleService : IArticleService
 
         try
         {
-            return await _articleRepository.UpdateArticleAsync(id, article, current.Content, current.Summary);
+            var existingRevisions = await _revisionRepository.GetRevisionsAsync(id);
+            var revision = new Revision
+            {
+                ArticleId = id,
+                Content = current.Content,
+                Summary = request.Summary,
+                VersionNumber = existingRevisions.Count() + 1,
+                SavedAt = DateTime.UtcNow
+            };
+            await _revisionRepository.AddRevisionAsync(revision);
+
+            return await _articleRepository.UpdateArticleAsync(id, article);
         }
         catch (Exception ex)
         {
@@ -175,13 +197,9 @@ public class ArticleService : IArticleService
 
     public async Task<IEnumerable<ArticleResponse>> SearchAsync(string query)
     {
-        var articles = await _articleRepository.SearchArticlesAsync(query);
-        var responses = new List<ArticleResponse>();
-        foreach (var article in articles ?? new List<Article>())
-        {
-            responses.Add(await ToResponseAsync(article));
-        }
-        return responses;
+        var articles = (await _articleRepository.SearchArticlesAsync(query) ?? new List<Article>()).ToList();
+        var usernameMap = await _authService.GetUsernamesByIdsAsync(articles.Select(a => a.AuthorId));
+        return articles.Select(a => ToResponse(a, usernameMap)).ToList();
     }
 
     private static RevisionResponse ToRevisionResponse(Revision revision) => new RevisionResponse
