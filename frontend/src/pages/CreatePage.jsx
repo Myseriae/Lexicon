@@ -8,6 +8,7 @@ import './CreatePage.css';
 const CreatePage = () => {
   const [formData, setFormData] = useState({
     title: '',
+    summary: '',
     content: ''
   });
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,7 @@ const CreatePage = () => {
       console.log('Form submitted successfully');
       setFormData({
         title: '',
+        summary: '',
         content: ''
       });
       setModal({ isOpen: true, message: 'Article created successfully!', type: 'success' });
@@ -62,6 +64,21 @@ const CreatePage = () => {
             onChange={handleChange}
             className="form-input"
             required
+            disabled={loading}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="summary" className="form-label">Summary</label>
+          <textarea
+            id="summary"
+            value={formData.summary}
+            onChange={(e) => {
+              setError(null);
+              setFormData(prev => ({ ...prev, summary: e.target.value }));
+            }}
+            className="form-textarea summary-textarea"
+            placeholder="Leave empty — if a Wikipedia article matches the title, a summary will be generated automatically."
+            rows={3}
             disabled={loading}
           />
         </div>
