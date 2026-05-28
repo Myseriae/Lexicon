@@ -226,15 +226,31 @@ public class ArticleService : IArticleService
 
     public async Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId)
     {
+        await GetExistingArticleAsync(articleId);
+
         var collaborators = await _articleRepository.GetCollaboratorsAsync(articleId);
+
         return collaborators.Select(ToCollaboratorResponse);
     }
 
-    public async Task<bool> AddCollaboratorAsync(int articleId, string userId)
+    public async Task<bool> AddCollaboratorAsync(
+        int articleId,
+        string collaboratorUserId,
+        string currentUserId,
+        bool isAdmin)
     {
+        var article = await GetExistingArticleAsync(articleId);
+
+        if (!isAdmin && article.AuthorId != currentUserId)
+        {
+            throw new UnauthorizedAccessException(
+                $"User {currentUserId} is not allowed to manage collaborators for article {articleId}"
+            );
+        }
+
         try
         {
-            return await _articleRepository.AddCollaboratorAsync(articleId, userId);
+            return await _articleRepository.AddCollaboratorAsync(articleId, collaboratorUserId);
         }
         catch (Exception ex)
         {
@@ -243,22 +259,45 @@ public class ArticleService : IArticleService
         }
     }
 
-    public async Task<bool> AddCollaboratorByUsernameAsync(int articleId, string username)
+    public async Task<bool> AddCollaboratorByUsernameAsync(
+        int articleId,
+        string username,
+        string currentUserId,
+        bool isAdmin)
     {
-        var userId = await _authService.GetUserIdByUsernameAsync(username);
-        if (userId == null)
+        var collaboratorUserId = await _authService.GetUserIdByUsernameAsync(username);
+
+        if (collaboratorUserId == null)
         {
             throw new ArgumentException($"User with username '{username}' not found");
         }
 
-        return await AddCollaboratorAsync(articleId, userId);
+        return await AddCollaboratorAsync(
+            articleId,
+            collaboratorUserId,
+            currentUserId,
+            isAdmin
+        );
     }
 
-    public async Task<bool> RemoveCollaboratorAsync(int articleId, string userId)
+    public async Task<bool> RemoveCollaboratorAsync(
+        int articleId,
+        string collaboratorUserId,
+        string currentUserId,
+        bool isAdmin)
     {
+        var article = await GetExistingArticleAsync(articleId);
+
+        if (!isAdmin && article.AuthorId != currentUserId)
+        {
+            throw new UnauthorizedAccessException(
+                $"User {currentUserId} is not allowed to manage collaborators for article {articleId}"
+            );
+        }
+
         try
         {
-            return await _articleRepository.RemoveCollaboratorAsync(articleId, userId);
+            return await _articleRepository.RemoveCollaboratorAsync(articleId, collaboratorUserId);
         }
         catch (Exception ex)
         {
@@ -269,6 +308,8 @@ public class ArticleService : IArticleService
 
     public async Task<bool> IsCollaboratorAsync(int articleId, string userId)
     {
+        await GetExistingArticleAsync(articleId);
+
         try
         {
             return await _articleRepository.IsCollaboratorAsync(articleId, userId);
@@ -286,5 +327,17 @@ public class ArticleService : IArticleService
         if (article.AuthorId == userId) return true;
         if (await _articleRepository.IsCollaboratorAsync(article.Id, userId)) return true;
         return false;
+    }
+    
+    private async Task<Article> GetExistingArticleAsync(int articleId)
+    {
+        var article = await _articleRepository.GetArticleByIdAsync(articleId);
+
+        if (article == null)
+        {
+            throw new KeyNotFoundException($"Article with ID {articleId} not found");
+        }
+
+        return article;
     }
 }

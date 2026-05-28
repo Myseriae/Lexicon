@@ -47,24 +47,6 @@ const HomePage = () => {
         fetchArticles();
     }, [tag, search]);
 
-    const handleDelete = async (id) => {
-        setModal({
-            isOpen: true,
-            message: 'Are you sure you want to delete this article?',
-            type: 'confirm',
-            onConfirm: async () => {
-                try {
-                    await deleteArticle(id);
-
-                    setArticles(prev =>
-                        prev.filter(a => a.id !== id)
-                    );
-                } catch (err) {
-                    setError(err.message);
-                }
-            }
-        });
-    };
 
     if (loading) {
         return <div className="loading">Loading...</div>;
@@ -106,19 +88,7 @@ const HomePage = () => {
                                     {article.title}
                                 </h2>
 
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDelete(article.id);
-                                    }}
-                                    className="delete-btn"
-                                    title="Delete article"
-                                >
-                                    <img
-                                        src="/trash.svg"
-                                        alt="Delete"
-                                    />
-                                </button>
+
                             </div>
 
                             <p className="article-author">

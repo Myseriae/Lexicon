@@ -78,26 +78,35 @@ using (var scope = app.Services.CreateScope())
 {
     var db      = scope.ServiceProvider.GetRequiredService<LexiconDbContext>();
     var seeder  = scope.ServiceProvider.GetRequiredService<AuthSeeder>();
-    var retries = 3;
-    while (retries-- > 0)
+
+    if (app.Environment.IsEnvironment("Testing"))
     {
-        try
+        await db.Database.EnsureCreatedAsync();
+        await seeder.SeedRolesAsync();
+    }
+    else
+    {
+        var retries = 3;
+        while (retries-- > 0)
         {
-            await db.Database.MigrateAsync();
-            Console.WriteLine("Migrations applied successfully.");
-            await seeder.SeedRolesAsync();
-            break;
-        }
-        catch
-        {
-            if (retries == 0) throw;
-            Console.WriteLine("Waiting for database, retrying...");
-            await Task.Delay(3000);
+            try
+            {
+                await db.Database.MigrateAsync();
+                Console.WriteLine("Migrations applied successfully.");
+                await seeder.SeedRolesAsync();
+                break;
+            }
+            catch
+            {
+                if (retries == 0) throw;
+                Console.WriteLine("Waiting for database, retrying...");
+                await Task.Delay(3000);
+            }
         }
     }
 }
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
     app.MapOpenApi();
 else
     app.UseHttpsRedirection();
@@ -117,11 +126,18 @@ await app.RunAsync();
 
 void AddAuthentication()
 {
-    var validIssuer = builder.Configuration["Jwt:ValidIssuer"]
+    var isTesting = builder.Environment.IsEnvironment("Testing");
+    var validIssuer = isTesting
+                      ? "lexicon-test-issuer"
+                      : builder.Configuration["Jwt:ValidIssuer"]
                       ?? throw new InvalidOperationException("Jwt:ValidIssuer is missing.");
-    var validAudience = builder.Configuration["Jwt:ValidAudience"]
+    var validAudience = isTesting
+                        ? "lexicon-test-audience"
+                        : builder.Configuration["Jwt:ValidAudience"]
                         ?? throw new InvalidOperationException("Jwt:ValidAudience is missing.");
-    var issuerSigningKey = builder.Configuration["Jwt:IssuerSigningKey"]
+    var issuerSigningKey = isTesting
+                           ? "lexicon-test-signing-key-with-32-chars"
+                           : builder.Configuration["Jwt:IssuerSigningKey"]
                            ?? throw new InvalidOperationException(
                                "Jwt:IssuerSigningKey is missing. " +
                                "Set it via: dotnet user-secrets set \"Jwt:IssuerSigningKey\" \"<secret>\"");
@@ -160,3 +176,5 @@ void AddIdentity()
         .AddRoles<IdentityRole>()               // must come before AddEntityFrameworkStores
         .AddEntityFrameworkStores<LexiconDbContext>();
 }
+
+public partial class Program;
