@@ -20,6 +20,12 @@ public class EFRevisionRepository : IRevisionRepository
             .ToListAsync();
     }
 
+    public async Task<Revision?> GetRevisionAsync(int articleId, int revisionId)
+    {
+        return await _context.Revisions
+            .FirstOrDefaultAsync(r => r.ArticleId == articleId && r.Id == revisionId);
+    }
+
     public async Task AddRevisionAsync(Revision revision)
     {
         _context.Revisions.Add(revision);

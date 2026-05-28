@@ -10,8 +10,9 @@ public interface IArticleService
     Task<bool> DeleteArticleAsync(int id, string userId, bool isAdmin);
     Task<bool> UpdateArticleAsync(int id, UpdateArticleRequest request, string userId, bool isAdmin);
     Task<IEnumerable<ArticleResponse>> SearchAsync(string query);
-    Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId);
-    Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId);
+    Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId, string userId, bool isAdmin);
+    Task<bool> RollbackArticleAsync(int articleId, int revisionId, string userId, bool isAdmin);
+    Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId, string userId, bool isAdmin);
     Task<bool> AddCollaboratorAsync(
         int articleId,
         string collaboratorUserId,

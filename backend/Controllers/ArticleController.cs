@@ -42,16 +42,50 @@ public class ArticleController : ControllerBase
         => Ok(await _articleService.SearchAsync(query));
 
     [HttpGet("{articleId}/revisions")]
+    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<ActionResult<IEnumerable<RevisionResponse>>> GetRevisions(int articleId)
-        => Ok(await _articleService.GetRevisionsAsync(articleId));
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var isAdmin = User.IsInRole(Roles.Admin);
+
+        try
+        {
+            return Ok(await _articleService.GetRevisionsAsync(articleId, userId, isAdmin));
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 
     [HttpGet("{articleId}/collaborators")]
     [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<ActionResult<IEnumerable<CollaboratorResponse>>> GetCollaborators(int articleId)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var isAdmin = User.IsInRole(Roles.Admin);
+
         try
         {
-            return Ok(await _articleService.GetCollaboratorsAsync(articleId));
+            return Ok(await _articleService.GetCollaboratorsAsync(articleId, userId, isAdmin));
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
         }
         catch (KeyNotFoundException ex)
         {
@@ -125,6 +159,35 @@ public class ArticleController : ControllerBase
         {
             Console.WriteLine(ex.Message);
             return StatusCode(500, "Failed to update article.");
+        }
+    }
+
+    [HttpPost("{articleId}/revisions/{revisionId}/rollback")]
+    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
+    public async Task<IActionResult> RollbackArticle(int articleId, int revisionId)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var isAdmin = User.IsInRole(Roles.Admin);
+
+        try
+        {
+            var success = await _articleService.RollbackArticleAsync(articleId, revisionId, userId, isAdmin);
+            if (!success) return NotFound();
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return StatusCode(500, "Failed to rollback article.");
         }
     }
 

@@ -132,4 +132,124 @@ public class ArticleServiceTests
 
         Assert.That(result, Is.False);
     }
+
+    [Test]
+    public async Task UpdateArticleAsync_CreatesRevisionFromPreviousSummaryAndContent_WhenTrackedFieldsChange()
+    {
+        var current = new Article
+        {
+            Id = 7,
+            AuthorId = "author-id",
+            Title = "Original title",
+            Content = "Old content",
+            Summary = "Old summary"
+        };
+
+        var request = new UpdateArticleRequest
+        {
+            Title = "Original title",
+            Content = "New content",
+            Summary = "New summary"
+        };
+
+        _articleRepoMock
+            .Setup(d => d.GetArticleByIdAsync(current.Id))
+            .ReturnsAsync(current);
+        _revisionRepoMock
+            .Setup(d => d.GetRevisionsAsync(current.Id))
+            .ReturnsAsync(new List<Revision>());
+        _articleRepoMock
+            .Setup(d => d.UpdateArticleAsync(current.Id, It.IsAny<Article>()))
+            .ReturnsAsync(true);
+
+        var result = await _service.UpdateArticleAsync(current.Id, request, "author-id", false);
+
+        Assert.That(result, Is.True);
+        _revisionRepoMock.Verify(d => d.AddRevisionAsync(It.Is<Revision>(revision =>
+            revision.ArticleId == current.Id &&
+            revision.Content == current.Content &&
+            revision.Summary == current.Summary &&
+            revision.VersionNumber == 1
+        )), Times.Once);
+    }
+
+    [Test]
+    public async Task UpdateArticleAsync_DoesNotCreateRevision_WhenOnlyTitleChanges()
+    {
+        var current = new Article
+        {
+            Id = 8,
+            AuthorId = "author-id",
+            Title = "Original title",
+            Content = "Same content",
+            Summary = "Same summary"
+        };
+
+        var request = new UpdateArticleRequest
+        {
+            Title = "New title",
+            Content = current.Content,
+            Summary = current.Summary
+        };
+
+        _articleRepoMock
+            .Setup(d => d.GetArticleByIdAsync(current.Id))
+            .ReturnsAsync(current);
+        _articleRepoMock
+            .Setup(d => d.UpdateArticleAsync(current.Id, It.IsAny<Article>()))
+            .ReturnsAsync(true);
+
+        var result = await _service.UpdateArticleAsync(current.Id, request, "author-id", false);
+
+        Assert.That(result, Is.True);
+        _revisionRepoMock.Verify(d => d.AddRevisionAsync(It.IsAny<Revision>()), Times.Never);
+    }
+
+    [Test]
+    public async Task RollbackArticleAsync_SavesCurrentArticleAsRevision_AndRestoresSelectedRevision()
+    {
+        var current = new Article
+        {
+            Id = 9,
+            AuthorId = "author-id",
+            Title = "Rollback title",
+            Content = "Current content",
+            Summary = "Current summary"
+        };
+        var revision = new Revision
+        {
+            Id = 3,
+            ArticleId = current.Id,
+            Content = "Previous content",
+            Summary = "Previous summary",
+            VersionNumber = 1
+        };
+
+        _articleRepoMock
+            .Setup(d => d.GetArticleByIdAsync(current.Id))
+            .ReturnsAsync(current);
+        _revisionRepoMock
+            .Setup(d => d.GetRevisionAsync(current.Id, revision.Id))
+            .ReturnsAsync(revision);
+        _revisionRepoMock
+            .Setup(d => d.GetRevisionsAsync(current.Id))
+            .ReturnsAsync(new List<Revision> { revision });
+        _articleRepoMock
+            .Setup(d => d.UpdateArticleAsync(current.Id, It.IsAny<Article>()))
+            .ReturnsAsync(true);
+
+        var result = await _service.RollbackArticleAsync(current.Id, revision.Id, "author-id", false);
+
+        Assert.That(result, Is.True);
+        _revisionRepoMock.Verify(d => d.AddRevisionAsync(It.Is<Revision>(saved =>
+            saved.Content == current.Content &&
+            saved.Summary == current.Summary &&
+            saved.VersionNumber == 2
+        )), Times.Once);
+        _articleRepoMock.Verify(d => d.UpdateArticleAsync(current.Id, It.Is<Article>(updated =>
+            updated.Title == current.Title &&
+            updated.Content == revision.Content &&
+            updated.Summary == revision.Summary
+        )), Times.Once);
+    }
 }

@@ -14,6 +14,7 @@
   margin-top: 2rem;
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .btn {
@@ -37,6 +38,12 @@
 
 .btn-delete:hover {
   background-color: #ff3333;
+}
+
+.btn-secondary {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
 }
 
 .input,
@@ -105,6 +112,150 @@
   padding: 1rem;
   border-radius: 4px;
   margin-bottom: 1rem;
+}
+
+.article-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid #444;
+  margin-bottom: 1.5rem;
+}
+
+.article-tab {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  min-width: 8rem;
+}
+
+.article-tab:hover {
+  color: #fff;
+  background-color: #1b1b1b;
+}
+
+.article-tab.active {
+  color: #000;
+  background-color: #00cfff;
+  border-color: #00cfff;
+}
+
+.article-tab-content {
+  min-height: 18rem;
+}
+
+.revisions-panel h2,
+.revision-preview h3 {
+  margin: 0;
+}
+
+.revisions-header,
+.revision-preview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.revision-layout {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.revision-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.revision-list-item {
+  background-color: #1f1f1f;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.revision-list-item:hover,
+.revision-list-item.selected {
+  border-color: #00cfff;
+}
+
+.revision-list-item.selected {
+  background-color: rgba(0, 207, 255, 0.12);
+}
+
+.revision-list-item small,
+.revision-preview-header p {
+  color: #aaa;
+  margin: 0.25rem 0 0;
+}
+
+.revision-preview {
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: #151515;
+  min-width: 0;
+}
+
+.revision-summary {
+  color: #00cfff;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.revision-content {
+  border-top: 1px solid #333;
+  padding-top: 1rem;
+}
+
+.revision-message,
+.revision-empty {
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.revision-message.error {
+  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.1);
+}
+
+.revision-empty {
+  color: #aaa;
+  background-color: #1f1f1f;
+}
+
+@media (max-width: 700px) {
+  .article-tabs {
+    overflow-x: auto;
+  }
+
+  .article-tab {
+    min-width: 7rem;
+    flex: 0 0 auto;
+  }
+
+  .revision-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .revisions-header,
+  .revision-preview-header {
+    flex-direction: column;
+  }
 }
 
 /* MDEditor dark theme overrides */

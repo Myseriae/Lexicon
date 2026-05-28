@@ -32,6 +32,16 @@ export const deleteArticle = (id) => {
     });
 };
 
+export const getRevisions = (articleId) => {
+    return requestJson(`/api/articles/${articleId}/revisions`);
+};
+
+export const rollbackArticle = (articleId, revisionId) => {
+    return requestJson(`/api/articles/${articleId}/revisions/${revisionId}/rollback`, {
+        method: 'POST',
+    });
+};
+
 export const searchArticles = (query) => {
     return requestJson(`/api/articles/search?query=${encodeURIComponent(query)}`);
 };

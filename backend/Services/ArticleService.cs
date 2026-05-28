@@ -41,6 +41,7 @@ public class ArticleService : IArticleService
         return new ArticleResponse
         {
             Id = article.Id,
+            AuthorId = article.AuthorId,
             AuthorUsername = authorUsername,
             Title = article.Title,
             Content = article.Content,
@@ -61,6 +62,7 @@ public class ArticleService : IArticleService
         return new ArticleResponse
         {
             Id = article.Id,
+            AuthorId = article.AuthorId,
             AuthorUsername = authorUsername,
             Title = article.Title,
             Content = article.Content,
@@ -80,6 +82,7 @@ public class ArticleService : IArticleService
         return new ArticleResponse
         {
             Id = article.Id,
+            AuthorId = article.AuthorId,
             AuthorUsername = usernameMap.GetValueOrDefault(article.AuthorId, article.AuthorId),
             Title = article.Title,
             Content = article.Content,
@@ -93,7 +96,7 @@ public class ArticleService : IArticleService
     public async Task<IEnumerable<ArticleResponse>> GetArticlesAsync(string? tag = null)
     {
         var articles = (await _articleRepository.GetArticlesAsync(tag) ?? new List<Article>()).ToList();
-        var usernameMap = await _authService.GetUsernamesByIdsAsync(articles.Select(a => a.AuthorId));
+        var usernameMap = await _authService.GetUsernamesByIdsAsync(articles.Select(a => a.AuthorId)) ?? new Dictionary<string, string>();
         return articles.Select(a => ToResponse(a, usernameMap)).ToList();
     }
 
@@ -175,16 +178,10 @@ public class ArticleService : IArticleService
 
         try
         {
-            var existingRevisions = await _revisionRepository.GetRevisionsAsync(id);
-            var revision = new Revision
+            if (HasRevisionTrackedChange(current, request))
             {
-                ArticleId = id,
-                Content = current.Content,
-                Summary = request.Summary,
-                VersionNumber = existingRevisions.Count() + 1,
-                SavedAt = DateTime.UtcNow
-            };
-            await _revisionRepository.AddRevisionAsync(revision);
+                await AddRevisionForCurrentArticleAsync(current);
+            }
 
             return await _articleRepository.UpdateArticleAsync(id, article);
         }
@@ -198,7 +195,7 @@ public class ArticleService : IArticleService
     public async Task<IEnumerable<ArticleResponse>> SearchAsync(string query)
     {
         var articles = (await _articleRepository.SearchArticlesAsync(query) ?? new List<Article>()).ToList();
-        var usernameMap = await _authService.GetUsernamesByIdsAsync(articles.Select(a => a.AuthorId));
+        var usernameMap = await _authService.GetUsernamesByIdsAsync(articles.Select(a => a.AuthorId)) ?? new Dictionary<string, string>();
         return articles.Select(a => ToResponse(a, usernameMap)).ToList();
     }
 
@@ -212,10 +209,50 @@ public class ArticleService : IArticleService
         SavedAt = revision.SavedAt
     };
 
-    public async Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId)
+    public async Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId, string userId, bool isAdmin)
     {
+        var article = await GetExistingArticleAsync(articleId);
+
+        if (!await CanEditArticle(article, userId, isAdmin))
+        {
+            throw new UnauthorizedAccessException($"User {userId} does not have permission to view revisions for article {articleId}");
+        }
+
         var revisions = await _revisionRepository.GetRevisionsAsync(articleId);
         return revisions.Select(ToRevisionResponse);
+    }
+
+    public async Task<bool> RollbackArticleAsync(int articleId, int revisionId, string userId, bool isAdmin)
+    {
+        var current = await _articleRepository.GetArticleByIdAsync(articleId);
+        if (current == null) return false;
+
+        if (!await CanEditArticle(current, userId, isAdmin))
+        {
+            throw new UnauthorizedAccessException($"User {userId} does not have permission to rollback article {articleId}");
+        }
+
+        var revision = await _revisionRepository.GetRevisionAsync(articleId, revisionId);
+        if (revision == null) return false;
+
+        try
+        {
+            await AddRevisionForCurrentArticleAsync(current);
+
+            var restored = new Article
+            {
+                Title = current.Title,
+                Content = revision.Content,
+                Summary = revision.Summary
+            };
+
+            return await _articleRepository.UpdateArticleAsync(articleId, restored);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to rollback article with ID {Id} to revision {RevisionId}", articleId, revisionId);
+            throw;
+        }
     }
 
     private static CollaboratorResponse ToCollaboratorResponse(ArticleCollaborator collaborator) => new CollaboratorResponse
@@ -224,9 +261,14 @@ public class ArticleService : IArticleService
         UserName = collaborator.User.UserName ?? ""
     };
 
-    public async Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId)
+    public async Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId, string userId, bool isAdmin)
     {
-        await GetExistingArticleAsync(articleId);
+        var article = await GetExistingArticleAsync(articleId);
+
+        if (!await CanEditArticle(article, userId, isAdmin))
+        {
+            throw new UnauthorizedAccessException($"User {userId} does not have permission to view collaborators for article {articleId}");
+        }
 
         var collaborators = await _articleRepository.GetCollaboratorsAsync(articleId);
 
@@ -327,6 +369,26 @@ public class ArticleService : IArticleService
         if (article.AuthorId == userId) return true;
         if (await _articleRepository.IsCollaboratorAsync(article.Id, userId)) return true;
         return false;
+    }
+
+    private async Task AddRevisionForCurrentArticleAsync(Article article)
+    {
+        var existingRevisions = await _revisionRepository.GetRevisionsAsync(article.Id);
+        var revision = new Revision
+        {
+            ArticleId = article.Id,
+            Content = article.Content,
+            Summary = article.Summary,
+            VersionNumber = existingRevisions.Count() + 1,
+            SavedAt = DateTime.UtcNow
+        };
+
+        await _revisionRepository.AddRevisionAsync(revision);
+    }
+
+    private static bool HasRevisionTrackedChange(Article current, UpdateArticleRequest request)
+    {
+        return current.Content != request.Content || current.Summary != request.Summary;
     }
     
     private async Task<Article> GetExistingArticleAsync(int articleId)
