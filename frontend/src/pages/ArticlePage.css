@@ -454,3 +454,32 @@
   padding: 0.25rem 0.65rem;
   font-size: 0.85rem;
 }
+
+/* Removable tag button */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tag-remove {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: #00cfff;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 0.25rem;
+}
+
+.tag-input-inline {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tag-input-inline .input {
+  width: 120px;
+  padding: 0.25rem 0.5rem;
+}
+

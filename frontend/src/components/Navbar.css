@@ -84,13 +84,15 @@
 .navbar-search {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
   flex: 1;
   min-width: 0;
 }
 
 .search-container {
   width: 100%;
-  max-width: 40%;
+  max-width: 50%;
   background-color: #111827;
   border: 1px solid #374151;
   border-radius: 9999px;
@@ -98,6 +100,8 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-shrink: 1;
+  min-width: 200px;
 }
 
 .search-icon {
@@ -138,6 +142,14 @@
   justify-content: center;
   border-left: 1px solid rgba(255,255,255,0.03);
   flex-shrink: 0;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.search-button svg {
+  width: 18px;
+  height: 18px;
+  transition: stroke 0.2s ease;
 }
 
 .search-button:hover {
@@ -145,9 +157,55 @@
   background: rgba(255,255,255,0.02);
 }
 
+.search-button:hover svg {
+  stroke: #ffffff;
+}
+
 .search-button:focus {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
+}
+
+/* Tag search dropdown */
+.tag-search {
+  position: relative;
+}
+
+.tag-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: #0b0c0e;
+  border: 1px solid #374151;
+  box-shadow: 0 8px 24px rgba(2,6,23,0.6);
+  border-radius: 8px;
+  padding: 0.5rem;
+  z-index: 1200;
+}
+
+.tag-list-scroll {
+  max-height: 200px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
+
+.tag-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e5e7eb;
+  font-size: 0.875rem;
+}
+
+.tag-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
 }
 
 /* Right Section: Auth Buttons */

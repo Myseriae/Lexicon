@@ -8,6 +8,7 @@ import {
   getRevisions,
   rollbackArticle,
 } from '../api/api';
+import { addTagToArticle, removeTagFromArticle } from '../api/api';
 import Modal from '../components/Modal/Modal';
 import Collaborators from '../components/Collaborators/Collaborators';
 import MDEditor from '@uiw/react-md-editor';
@@ -33,6 +34,8 @@ const ArticlePage = () => {
   const [selectedRevisionId, setSelectedRevisionId] = useState(null);
   const [revisionsLoading, setRevisionsLoading] = useState(false);
   const [revisionMessage, setRevisionMessage] = useState(null);
+  const [tagInput, setTagInput] = useState('');
+  const [tagLoading, setTagLoading] = useState(false);
   const navigate = useNavigate();
   const { currentUser: authenticatedUser } = useAuth();
 
@@ -79,7 +82,10 @@ const ArticlePage = () => {
       try {
         setError(null);
         await fetchArticle();
-
+        // refresh collaborators if allowed
+        if (canEdit) {
+          fetchCollaborators();
+        }
       } catch (err) {
         setError(err.message);
       }
@@ -194,8 +200,81 @@ const ArticlePage = () => {
         {article.tags?.map(tag => (
           <span key={tag.id} className="tag-chip">
             {tag.name}
+            {canEdit && (
+              <button
+                type="button"
+                className="tag-remove"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    setTagLoading(true);
+                    await removeTagFromArticle(article.id, tag.id);
+                    await fetchArticle();
+                  } catch (err) {
+                    console.error('Failed to remove tag', err);
+                    setError(err.message || 'Failed to remove tag');
+                  } finally {
+                    setTagLoading(false);
+                  }
+                }}
+                disabled={tagLoading}
+                aria-label={`Remove tag ${tag.name}`}
+              >
+                ×
+              </button>
+            )}
           </span>
         ))}
+
+        {canEdit && (
+          <span className="tag-input-inline">
+            <input
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={async (e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (!tagInput.trim()) return;
+                  try {
+                    setTagLoading(true);
+                    await addTagToArticle(article.id, tagInput.trim());
+                    setTagInput('');
+                    await fetchArticle();
+                  } catch (err) {
+                    console.error('Failed to add tag', err);
+                    setError(err.message || 'Failed to add tag');
+                  } finally {
+                    setTagLoading(false);
+                  }
+                }
+              }}
+              className="input"
+              placeholder="New tag"
+              disabled={tagLoading}
+            />
+            <button
+              type="button"
+              className="btn"
+              onClick={async () => {
+                if (!tagInput.trim()) return;
+                try {
+                  setTagLoading(true);
+                  await addTagToArticle(article.id, tagInput.trim());
+                  setTagInput('');
+                  await fetchArticle();
+                } catch (err) {
+                  console.error('Failed to add tag', err);
+                  setError(err.message || 'Failed to add tag');
+                } finally {
+                  setTagLoading(false);
+                }
+              }}
+              disabled={tagLoading || !tagInput.trim()}
+            >
+              Add
+            </button>
+          </span>
+        )}
       </div>
       <p className={`article-summary ${!article.summary ? 'no-summary' : ''}`}><strong>Summary:</strong> {article.summary || "Create a summary for this article."}</p>
       <div className="article-content"><ReactMarkdown>{article.content}</ReactMarkdown></div>

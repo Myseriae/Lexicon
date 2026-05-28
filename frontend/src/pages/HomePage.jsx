@@ -20,7 +20,9 @@ const HomePage = () => {
     const [searchParams] = useSearchParams();
 
     const tag = searchParams.get('tag');
+    const tagsParam = searchParams.get('tags');
     const search = searchParams.get('search');
+    const selectedTags = tagsParam ? tagsParam.split(',').map(t => t.trim()).filter(Boolean) : [];
 
     useEffect(() => {
         const fetchArticles = async () => {
@@ -30,6 +32,11 @@ const HomePage = () => {
                 let data;
                 if (search && search.trim()) {
                     data = await searchArticles(search);
+                } else if (selectedTags.length > 0) {
+                    // backend does not support multi-tag query, fetch all and filter client-side
+                    const all = await getArticles();
+                    const lowered = selectedTags.map(t => t.toLowerCase());
+                    data = all.filter(a => (a.tags || []).some(tag => lowered.includes(tag.name.toLowerCase())));
                 } else if (tag) {
                     data = await getArticles(tag);
                 } else {
@@ -45,7 +52,7 @@ const HomePage = () => {
         };
 
         fetchArticles();
-    }, [tag, search]);
+    }, [tag, search, tagsParam]);
 
 
     if (loading) {
@@ -59,10 +66,15 @@ const HomePage = () => {
     return (
         <div className="home-container">
             <h1 className="home-title">
-                {tag ? `Articles tagged with "${tag}"` : 'Articles'}
+                {selectedTags.length > 0
+                    ? `Articles tagged with "${selectedTags.join(', ')}"`
+                    : tag
+                        ? `Articles tagged with "${tag}"`
+                        : 'Articles'
+                }
             </h1>
 
-            {tag && (
+            {(selectedTags.length > 0 || tag) && (
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <button
                         className="btn"
