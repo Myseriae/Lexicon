@@ -217,13 +217,24 @@ public class ArticleService : IArticleService
         return collaborators.Select(ToCollaboratorResponse);
     }
 
-    public async Task<bool> AddCollaboratorAsync(int articleId, string userId)
+    public async Task<bool> AddCollaboratorAsync(
+        int articleId,
+        string collaboratorUserId,
+        string currentUserId,
+        bool isAdmin)
     {
-        await GetExistingArticleAsync(articleId);
+        var article = await GetExistingArticleAsync(articleId);
+
+        if (!isAdmin && article.AuthorId != currentUserId)
+        {
+            throw new UnauthorizedAccessException(
+                $"User {currentUserId} is not allowed to manage collaborators for article {articleId}"
+            );
+        }
 
         try
         {
-            return await _articleRepository.AddCollaboratorAsync(articleId, userId);
+            return await _articleRepository.AddCollaboratorAsync(articleId, collaboratorUserId);
         }
         catch (Exception ex)
         {
@@ -232,24 +243,45 @@ public class ArticleService : IArticleService
         }
     }
 
-    public async Task<bool> AddCollaboratorByUsernameAsync(int articleId, string username)
+    public async Task<bool> AddCollaboratorByUsernameAsync(
+        int articleId,
+        string username,
+        string currentUserId,
+        bool isAdmin)
     {
-        var userId = await _authService.GetUserIdByUsernameAsync(username);
-        if (userId == null)
+        var collaboratorUserId = await _authService.GetUserIdByUsernameAsync(username);
+
+        if (collaboratorUserId == null)
         {
             throw new ArgumentException($"User with username '{username}' not found");
         }
 
-        return await AddCollaboratorAsync(articleId, userId);
+        return await AddCollaboratorAsync(
+            articleId,
+            collaboratorUserId,
+            currentUserId,
+            isAdmin
+        );
     }
 
-    public async Task<bool> RemoveCollaboratorAsync(int articleId, string userId)
+    public async Task<bool> RemoveCollaboratorAsync(
+        int articleId,
+        string collaboratorUserId,
+        string currentUserId,
+        bool isAdmin)
     {
-        await GetExistingArticleAsync(articleId);
+        var article = await GetExistingArticleAsync(articleId);
+
+        if (!isAdmin && article.AuthorId != currentUserId)
+        {
+            throw new UnauthorizedAccessException(
+                $"User {currentUserId} is not allowed to manage collaborators for article {articleId}"
+            );
+        }
 
         try
         {
-            return await _articleRepository.RemoveCollaboratorAsync(articleId, userId);
+            return await _articleRepository.RemoveCollaboratorAsync(articleId, collaboratorUserId);
         }
         catch (Exception ex)
         {

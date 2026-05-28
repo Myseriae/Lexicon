@@ -158,84 +158,138 @@ public class ArticleController : ControllerBase
     }
 
     [HttpPost("{articleId}/collaborators/{userId}")]
-    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
-    public async Task<IActionResult> AddCollaborator(int articleId, string userId)
+[Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
+public async Task<IActionResult> AddCollaborator(int articleId, string userId)
+{
+    var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    if (string.IsNullOrEmpty(currentUserId))
     {
-        try
-        {
-            var success = await _articleService.AddCollaboratorAsync(articleId, userId);
-
-            if (!success)
-            {
-                return BadRequest("User is already a collaborator or invalid user.");
-            }
-
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return StatusCode(500, "Failed to add collaborator.");
-        }
+        return Unauthorized();
     }
 
-    [HttpPost("{articleId}/collaborators/by-username/{username}")]
-    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
-    public async Task<IActionResult> AddCollaboratorByUsername(int articleId, string username)
+    var isAdmin = User.IsInRole(Roles.Admin);
+
+    try
     {
-        try
-        {
-            var success = await _articleService.AddCollaboratorByUsernameAsync(articleId, username);
+        var success = await _articleService.AddCollaboratorAsync(
+            articleId,
+            userId,
+            currentUserId,
+            isAdmin
+        );
 
-            if (!success)
-            {
-                return BadRequest("User is already a collaborator or invalid user.");
-            }
+        if (!success)
+        {
+            return BadRequest("User is already a collaborator or invalid user.");
+        }
 
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return StatusCode(500, "Failed to add collaborator.");
-        }
+        return NoContent();
+    }
+    catch (UnauthorizedAccessException)
+    {
+        return Forbid();
+    }
+    catch (KeyNotFoundException ex)
+    {
+        return NotFound(ex.Message);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+        return StatusCode(500, "Failed to add collaborator.");
+    }
+}
+
+[HttpPost("{articleId}/collaborators/by-username/{username}")]
+[Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
+public async Task<IActionResult> AddCollaboratorByUsername(int articleId, string username)
+{
+    var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    if (string.IsNullOrEmpty(currentUserId))
+    {
+        return Unauthorized();
     }
 
-    [HttpDelete("{articleId}/collaborators/{userId}")]
-    [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
-    public async Task<IActionResult> RemoveCollaborator(int articleId, string userId)
+    var isAdmin = User.IsInRole(Roles.Admin);
+
+    try
     {
-        try
-        {
-            var success = await _articleService.RemoveCollaboratorAsync(articleId, userId);
+        var success = await _articleService.AddCollaboratorByUsernameAsync(
+            articleId,
+            username,
+            currentUserId,
+            isAdmin
+        );
 
-            if (!success)
-            {
-                return NotFound("Collaborator not found.");
-            }
+        if (!success)
+        {
+            return BadRequest("User is already a collaborator or invalid user.");
+        }
 
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return StatusCode(500, "Failed to remove collaborator.");
-        }
+        return NoContent();
     }
+    catch (UnauthorizedAccessException)
+    {
+        return Forbid();
+    }
+    catch (KeyNotFoundException ex)
+    {
+        return NotFound(ex.Message);
+    }
+    catch (ArgumentException ex)
+    {
+        return BadRequest(ex.Message);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+        return StatusCode(500, "Failed to add collaborator.");
+    }
+}
+
+[HttpDelete("{articleId}/collaborators/{userId}")]
+[Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
+public async Task<IActionResult> RemoveCollaborator(int articleId, string userId)
+{
+    var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    if (string.IsNullOrEmpty(currentUserId))
+    {
+        return Unauthorized();
+    }
+
+    var isAdmin = User.IsInRole(Roles.Admin);
+
+    try
+    {
+        var success = await _articleService.RemoveCollaboratorAsync(
+            articleId,
+            userId,
+            currentUserId,
+            isAdmin
+        );
+
+        if (!success)
+        {
+            return NotFound("Collaborator not found.");
+        }
+
+        return NoContent();
+    }
+    catch (UnauthorizedAccessException)
+    {
+        return Forbid();
+    }
+    catch (KeyNotFoundException ex)
+    {
+        return NotFound(ex.Message);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+        return StatusCode(500, "Failed to remove collaborator.");
+    }
+}
 }

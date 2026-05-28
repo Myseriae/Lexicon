@@ -12,8 +12,22 @@ public interface IArticleService
     Task<IEnumerable<ArticleResponse>> SearchAsync(string query);
     Task<IEnumerable<RevisionResponse>> GetRevisionsAsync(int articleId);
     Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId);
-    Task<bool> AddCollaboratorAsync(int articleId, string userId);
-    Task<bool> AddCollaboratorByUsernameAsync(int articleId, string username);
-    Task<bool> RemoveCollaboratorAsync(int articleId, string userId);
+    Task<bool> AddCollaboratorAsync(
+        int articleId,
+        string collaboratorUserId,
+        string currentUserId,
+        bool isAdmin);
+
+    Task<bool> AddCollaboratorByUsernameAsync(
+        int articleId,
+        string username,
+        string currentUserId,
+        bool isAdmin);
+
+    Task<bool> RemoveCollaboratorAsync(
+        int articleId,
+        string collaboratorUserId,
+        string currentUserId,
+        bool isAdmin);
     Task<bool> IsCollaboratorAsync(int articleId, string userId);
 }
