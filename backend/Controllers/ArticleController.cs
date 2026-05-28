@@ -48,12 +48,30 @@ public class ArticleController : ControllerBase
     [HttpGet("{articleId}/collaborators")]
     [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<ActionResult<IEnumerable<CollaboratorResponse>>> GetCollaborators(int articleId)
-        => Ok(await _articleService.GetCollaboratorsAsync(articleId));
+    {
+        try
+        {
+            return Ok(await _articleService.GetCollaboratorsAsync(articleId));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 
     [HttpGet("{articleId}/collaborators/{userId}/is-collaborator")]
     [Authorize(Roles = $"{Roles.Editor}, {Roles.Admin}")]
     public async Task<ActionResult<bool>> IsCollaborator(int articleId, string userId)
-        => Ok(await _articleService.IsCollaboratorAsync(articleId, userId));
+    {
+        try
+        {
+            return Ok(await _articleService.IsCollaboratorAsync(articleId, userId));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 
     // -------------------------------------------------------------------------
     // Write endpoints — require authentication (Editor or Admin)
@@ -146,8 +164,17 @@ public class ArticleController : ControllerBase
         try
         {
             var success = await _articleService.AddCollaboratorAsync(articleId, userId);
-            if (!success) return BadRequest("User is already a collaborator or invalid user.");
+
+            if (!success)
+            {
+                return BadRequest("User is already a collaborator or invalid user.");
+            }
+
             return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
         }
         catch (Exception ex)
         {
@@ -163,8 +190,17 @@ public class ArticleController : ControllerBase
         try
         {
             var success = await _articleService.AddCollaboratorByUsernameAsync(articleId, username);
-            if (!success) return BadRequest("User is already a collaborator or invalid user.");
+
+            if (!success)
+            {
+                return BadRequest("User is already a collaborator or invalid user.");
+            }
+
             return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
         }
         catch (ArgumentException ex)
         {
@@ -184,8 +220,17 @@ public class ArticleController : ControllerBase
         try
         {
             var success = await _articleService.RemoveCollaboratorAsync(articleId, userId);
-            if (!success) return NotFound("Collaborator not found.");
+
+            if (!success)
+            {
+                return NotFound("Collaborator not found.");
+            }
+
             return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
         }
         catch (Exception ex)
         {

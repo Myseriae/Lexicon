@@ -210,12 +210,17 @@ public class ArticleService : IArticleService
 
     public async Task<IEnumerable<CollaboratorResponse>> GetCollaboratorsAsync(int articleId)
     {
+        await GetExistingArticleAsync(articleId);
+
         var collaborators = await _articleRepository.GetCollaboratorsAsync(articleId);
+
         return collaborators.Select(ToCollaboratorResponse);
     }
 
     public async Task<bool> AddCollaboratorAsync(int articleId, string userId)
     {
+        await GetExistingArticleAsync(articleId);
+
         try
         {
             return await _articleRepository.AddCollaboratorAsync(articleId, userId);
@@ -240,6 +245,8 @@ public class ArticleService : IArticleService
 
     public async Task<bool> RemoveCollaboratorAsync(int articleId, string userId)
     {
+        await GetExistingArticleAsync(articleId);
+
         try
         {
             return await _articleRepository.RemoveCollaboratorAsync(articleId, userId);
@@ -253,6 +260,8 @@ public class ArticleService : IArticleService
 
     public async Task<bool> IsCollaboratorAsync(int articleId, string userId)
     {
+        await GetExistingArticleAsync(articleId);
+
         try
         {
             return await _articleRepository.IsCollaboratorAsync(articleId, userId);
@@ -270,5 +279,17 @@ public class ArticleService : IArticleService
         if (article.AuthorId == userId) return true;
         if (await _articleRepository.IsCollaboratorAsync(article.Id, userId)) return true;
         return false;
+    }
+    
+    private async Task<Article> GetExistingArticleAsync(int articleId)
+    {
+        var article = await _articleRepository.GetArticleByIdAsync(articleId);
+
+        if (article == null)
+        {
+            throw new KeyNotFoundException($"Article with ID {articleId} not found");
+        }
+
+        return article;
     }
 }
