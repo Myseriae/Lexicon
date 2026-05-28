@@ -1,6 +1,5 @@
-﻿using Lexicon.Data;
 using Lexicon.DTOs;
-using Lexicon.Model;
+using Lexicon.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,28 +9,28 @@ namespace Lexicon.Controllers;
 [Route("api")]
 public class TagController : ControllerBase
 {
-    private readonly ITagRepository _tagRepository;
+    private readonly ITagService _tagService;
 
-    public TagController(ITagRepository tagRepository)
+    public TagController(ITagService tagService)
     {
-        _tagRepository = tagRepository;
+        _tagService = tagService;
     }
 
     [HttpGet("tags")]
-    public async Task<ActionResult<IEnumerable<Tag>>> GetTags()
+    public async Task<ActionResult<IEnumerable<TagResponse>>> GetTags()
     {
-        var tags = await _tagRepository.GetAllAsync();
+        var tags = await _tagService.GetAllAsync();
         return Ok(tags);
     }
 
-    [HttpPost("api/articles/{id}/tags")]
+    [HttpPost("articles/{id}/tags")]
     [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
     public async Task<IActionResult> AddTagToArticle(int id, [FromBody] AddTagRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
             return BadRequest("Tag name is required.");
 
-        var success = await _tagRepository.AddTagToArticleAsync(id, request.Name);
+        var success = await _tagService.AddTagToArticleAsync(id, request.Name);
 
         if (!success)
             return NotFound();
@@ -39,11 +38,11 @@ public class TagController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("api/articles/{id}/tags/{tagId}")]
+    [HttpDelete("articles/{id}/tags/{tagId}")]
     [Authorize(Roles = $"{Lexicon.Services.Authentication.Roles.Editor}, {Lexicon.Services.Authentication.Roles.Admin}")]
     public async Task<IActionResult> RemoveTagFromArticle(int id, int tagId)
     {
-        var success = await _tagRepository.RemoveTagFromArticleAsync(id, tagId);
+        var success = await _tagService.RemoveTagFromArticleAsync(id, tagId);
 
         if (!success)
             return NotFound();

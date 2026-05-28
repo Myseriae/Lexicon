@@ -22,6 +22,7 @@ builder.Services.AddScoped<IRevisionRepository, EFRevisionRepository>();
 builder.Services.AddScoped<ITagRepository, EFTagRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, EFRefreshTokenRepository>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
+builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddHttpClient<IWikipediaService, WikipediaService>(client =>
 {
     client.DefaultRequestHeaders.UserAgent.ParseAdd("LexiconApp/1.0 (educational project)");
