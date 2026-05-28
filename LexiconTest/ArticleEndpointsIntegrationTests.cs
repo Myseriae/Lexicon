@@ -92,4 +92,45 @@ public class ArticleEndpointsIntegrationTests
         payload.Should().NotBeNull();
         return payload!;
     }
+    
+    
+    [Test]
+    public async Task SearchArticles_ReturnsMatchingArticle()
+    {
+        var registerRequest = new RegisterRequest(
+            Email: "search@test.com",
+            UserName: "search-user",
+            Password: "secret1");
+
+        var registerResponse =
+            await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
+
+        var authPayload =
+            await registerResponse.Content.ReadFromJsonAsync<AuthTokenResponse>();
+
+        _client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", authPayload!.AccessToken);
+
+        var createRequest = new CreateArticleRequest
+        {
+            Title = "CSharp Basics",
+            Content = "Learning ASP.NET Core",
+            Summary = "Search test"
+        };
+
+        await _client.PostAsJsonAsync("/api/articles", createRequest);
+
+        var searchResponse =
+            await _client.GetAsync("/api/articles/search?query=CSharp");
+
+        searchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var articles =
+            await searchResponse.Content.ReadFromJsonAsync<List<ArticleResponse>>();
+
+        articles.Should().NotBeNull();
+
+        articles!.Should().Contain(a =>
+            a.Title == "CSharp Basics");
+    }
 }
