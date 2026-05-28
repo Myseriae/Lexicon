@@ -1,4 +1,5 @@
 ﻿using Lexicon.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using System.Net;
 
@@ -11,7 +12,7 @@ public class WikipediaServiceTests
     public async Task ReturnsNull_OnFailedStatusCode()
     {
         var client = CreateClient(HttpStatusCode.NotFound, "{}");
-        var service = new WikipediaService(client);
+        var service = new WikipediaService(client, NullLogger<WikipediaService>.Instance);
 
         var result = await service.GetSummaryAsync("Test");
 
@@ -29,7 +30,7 @@ public class WikipediaServiceTests
         """;
 
         var client = CreateClient(HttpStatusCode.OK, json);
-        var service = new WikipediaService(client);
+        var service = new WikipediaService(client, NullLogger<WikipediaService>.Instance);
 
         var result = await service.GetSummaryAsync("Mercury");
 
@@ -40,7 +41,7 @@ public class WikipediaServiceTests
     public async Task ReturnsNull_OnException()
     {
         var client = new HttpClient(new ThrowingHandler());
-        var service = new WikipediaService(client);
+        var service = new WikipediaService(client, NullLogger<WikipediaService>.Instance);
 
         var result = await service.GetSummaryAsync("Cat");
 
@@ -58,7 +59,7 @@ public class WikipediaServiceTests
         """;
 
         var client = CreateClient(HttpStatusCode.OK, json);
-        var service = new WikipediaService(client);
+        var service = new WikipediaService(client, NullLogger<WikipediaService>.Instance);
 
         var result = await service.GetSummaryAsync("Cat");
 

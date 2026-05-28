@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Logging;
 
 // Load .env (for local dev without Docker). Does not override vars already set by the OS/Docker.
 DotNetEnv.Env.NoClobber().TraversePath().Load();
@@ -71,6 +72,7 @@ AddIdentity();
 
 // ===========================================================================
 var app = builder.Build();
+var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
 // ===========================================================================
 
 // Apply migrations and seed roles on startup.
@@ -92,14 +94,14 @@ using (var scope = app.Services.CreateScope())
             try
             {
                 await db.Database.MigrateAsync();
-                Console.WriteLine("Migrations applied successfully.");
+                logger.LogInformation("Migrations applied successfully.");
                 await seeder.SeedRolesAsync();
                 break;
             }
             catch
             {
                 if (retries == 0) throw;
-                Console.WriteLine("Waiting for database, retrying...");
+                logger.LogWarning("Waiting for database, retrying...");
                 await Task.Delay(3000);
             }
         }

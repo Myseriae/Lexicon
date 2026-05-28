@@ -3,6 +3,7 @@ using Lexicon.Services;
 using Lexicon.Services.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
 namespace Lexicon.Controllers;
@@ -12,10 +13,12 @@ namespace Lexicon.Controllers;
 public class ArticleController : ControllerBase
 {
     private readonly IArticleService _articleService;
+    private readonly ILogger<ArticleController> _logger;
 
-    public ArticleController(IArticleService articleService)
+    public ArticleController(IArticleService articleService, ILogger<ArticleController> logger)
     {
         _articleService = articleService;
+        _logger = logger;
     }
 
     // -------------------------------------------------------------------------
@@ -128,7 +131,7 @@ public class ArticleController : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex, "Failed to save article.");
             return StatusCode(500, "Failed to save article.");
         }
     }
@@ -157,7 +160,7 @@ public class ArticleController : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex, "Failed to update article {ArticleId}.", articleId);
             return StatusCode(500, "Failed to update article.");
         }
     }
@@ -186,7 +189,7 @@ public class ArticleController : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex, "Failed to rollback article {ArticleId} revision {RevisionId}.", articleId, revisionId);
             return StatusCode(500, "Failed to rollback article.");
         }
     }
@@ -215,7 +218,7 @@ public class ArticleController : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex, "Failed to delete article {ArticleId}.", articleId);
             return StatusCode(500, "Failed to delete article.");
         }
     }
@@ -259,7 +262,7 @@ public async Task<IActionResult> AddCollaborator(int articleId, string userId)
     }
     catch (Exception ex)
     {
-        Console.WriteLine(ex.Message);
+        _logger.LogError(ex, "Failed to add collaborator {UserId} to article {ArticleId}.", userId, articleId);
         return StatusCode(500, "Failed to add collaborator.");
     }
 }
@@ -307,7 +310,7 @@ public async Task<IActionResult> AddCollaboratorByUsername(int articleId, string
     }
     catch (Exception ex)
     {
-        Console.WriteLine(ex.Message);
+        _logger.LogError(ex, "Failed to add collaborator by username {Username} to article {ArticleId}.", username, articleId);
         return StatusCode(500, "Failed to add collaborator.");
     }
 }
@@ -351,7 +354,7 @@ public async Task<IActionResult> RemoveCollaborator(int articleId, string userId
     }
     catch (Exception ex)
     {
-        Console.WriteLine(ex.Message);
+        _logger.LogError(ex, "Failed to remove collaborator {UserId} from article {ArticleId}.", userId, articleId);
         return StatusCode(500, "Failed to remove collaborator.");
     }
 }

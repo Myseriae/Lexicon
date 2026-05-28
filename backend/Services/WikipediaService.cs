@@ -1,15 +1,18 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Lexicon.Services;
 
 public class WikipediaService : IWikipediaService
 {
     private readonly HttpClient _httpClient;
+    private readonly ILogger<WikipediaService> _logger;
 
-    public WikipediaService(HttpClient httpClient)
+    public WikipediaService(HttpClient httpClient, ILogger<WikipediaService> logger)
     {
         _httpClient = httpClient;
+        _logger = logger;
     }
 
     public async Task<string?> GetSummaryAsync(string title)
@@ -17,16 +20,16 @@ public class WikipediaService : IWikipediaService
         var url =
             $"https://en.wikipedia.org/api/rest_v1/page/summary/{Uri.EscapeDataString(title)}";
 
-        Console.WriteLine($"Wikipedia URL: {url}");
+        _logger.LogInformation("Wikipedia URL: {Url}", url);
 
         try
         {
             var response = await _httpClient.GetAsync(url);
 
-            Console.WriteLine($"Status code: {response.StatusCode}");
+            _logger.LogInformation("Wikipedia status code: {StatusCode}", response.StatusCode);
 
             var body = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Response body: {body}");
+            _logger.LogInformation("Wikipedia response body: {Body}", body);
 
             if (!response.IsSuccessStatusCode)
                 return null;
@@ -38,7 +41,7 @@ public class WikipediaService : IWikipediaService
                     PropertyNameCaseInsensitive = true
                 });
 
-            Console.WriteLine($"Extract: {data?.Extract}");
+            _logger.LogInformation("Wikipedia extract: {Extract}", data?.Extract);
 
             if (data?.Type == "disambiguation")
                 return null;
@@ -50,7 +53,7 @@ public class WikipediaService : IWikipediaService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR: {ex.Message}");
+            _logger.LogError(ex, "Wikipedia summary lookup failed for {Title}.", title);
             return null;
         }
     }
