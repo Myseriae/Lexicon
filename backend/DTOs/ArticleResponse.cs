@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Lexicon.DTOs;
 
 public class ArticleResponse
@@ -14,10 +12,4 @@ public class ArticleResponse
     public List<string> CollaboratorIds { get; set; } = new List<string>();
 
     public List<TagResponse> Tags { get; set; } = new();
-}
-
-public class TagResponse
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
 }
