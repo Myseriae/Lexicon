@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Identity;
 
 namespace Lexicon.Model;
 
@@ -18,5 +17,5 @@ public class ArticleCollaborator
     public Article Article { get; set; } = null!;
 
     [ForeignKey("UserId")]
-    public IdentityUser User { get; set; } = null!;
+    public ApplicationUser User { get; set; } = null!;
 }

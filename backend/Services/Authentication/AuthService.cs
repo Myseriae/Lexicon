@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using Lexicon.Data;
+using Lexicon.DTOs;
 using Lexicon.Model;
 using Lexicon.Services.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -9,22 +10,27 @@ namespace Lexicon.Services.Auth;
 
 public class AuthService : IAuthService
 {
-    private readonly UserManager<IdentityUser> _userManager;
+    private const string DeletedUserDisplayName = "Deleted User";
+
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly ITokenService _tokenService;
     private readonly IRefreshTokenRepository _refreshTokenRepo;
+    private readonly LexiconDbContext _dbContext;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
-        UserManager<IdentityUser> userManager,
+        UserManager<ApplicationUser> userManager,
         ITokenService tokenService,
         IRefreshTokenRepository refreshTokenRepo,
+        LexiconDbContext dbContext,
         IConfiguration configuration,
         ILogger<AuthService> logger)
     {
         _userManager       = userManager;
         _tokenService      = tokenService;
         _refreshTokenRepo  = refreshTokenRepo;
+        _dbContext         = dbContext;
         _configuration     = configuration;
         _logger            = logger;
     }
@@ -35,10 +41,11 @@ public class AuthService : IAuthService
 
     public async Task<AuthResult> RegisterAsync(string email, string username, string password)
     {
-        var user = new IdentityUser
+        var user = new ApplicationUser
         {
             UserName = username,
-            Email = email
+            Email = email,
+            IsDeleted = false
         };
 
         var result = await _userManager.CreateAsync(user, password);
@@ -80,7 +87,7 @@ public class AuthService : IAuthService
     public async Task<AuthResult> LoginAsync(string email, string password)
     {
         var user = await _userManager.FindByEmailAsync(email);
-        if (user is null)
+        if (user is null || user.IsDeleted)
             return Fail(email, "Bad credentials");
 
         var passwordValid = await _userManager.CheckPasswordAsync(user, password);
@@ -124,7 +131,7 @@ public class AuthService : IAuthService
         await _refreshTokenRepo.RevokeAsync(stored);
 
         var user = await _userManager.FindByIdAsync(stored.UserId);
-        if (user is null)
+        if (user is null || user.IsDeleted)
             return Fail(string.Empty, "User not found");
 
         var roles        = await _userManager.GetRolesAsync(user);
@@ -161,18 +168,82 @@ public class AuthService : IAuthService
         return true;
     }
 
+    public async Task<ProfileResponse?> GetProfileAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null || user.IsDeleted)
+            return null;
+
+        var articles = await _dbContext.Articles
+            .Where(a => a.AuthorId == userId)
+            .OrderByDescending(a => a.Created)
+            .Select(a => new ProfileArticleResponse
+            {
+                Id = a.Id,
+                Title = a.Title,
+                Summary = a.Summary,
+                Created = a.Created
+            })
+            .ToListAsync();
+
+        return new ProfileResponse
+        {
+            UserName = user.UserName ?? "",
+            Email = user.Email ?? "",
+            Articles = articles
+        };
+    }
+
+    public async Task<AuthResult> DeleteAccountAsync(string userId, string password)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null || user.IsDeleted)
+            return Fail(string.Empty, "User not found");
+
+        var passwordValid = await _userManager.CheckPasswordAsync(user, password);
+        if (!passwordValid)
+            return Fail(user.Email ?? string.Empty, "Password is incorrect");
+
+        var anonymizedEmail = $"deleted_{user.Id}@deleted.local";
+        var anonymizedUserName = $"DeletedUser_{user.Id}";
+
+        user.IsDeleted = true;
+        user.Email = anonymizedEmail;
+        user.NormalizedEmail = _userManager.NormalizeEmail(anonymizedEmail);
+        user.UserName = anonymizedUserName;
+        user.NormalizedUserName = _userManager.NormalizeName(anonymizedUserName);
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            var failure = new AuthResult(false, "", "", user.Email ?? "", user.UserName ?? "", "");
+
+            foreach (var error in result.Errors)
+                failure.ErrorMessages[error.Code] = error.Description;
+
+            return failure;
+        }
+
+        await _userManager.UpdateSecurityStampAsync(user);
+        await _refreshTokenRepo.RevokeAllForUserAsync(user.Id);
+
+        _logger.LogInformation("User '{UserId}' soft-deleted and anonymized.", user.Id);
+
+        return new AuthResult(true, "", "", anonymizedEmail, anonymizedUserName, "");
+    }
+
     /// <summary>Finds a user by username and returns their ID.</summary>
     public async Task<string?> GetUserIdByUsernameAsync(string username)
     {
         var user = await _userManager.FindByNameAsync(username);
-        return user?.Id;
+        return user?.IsDeleted == true ? null : user?.Id;
     }
 
     /// <summary>Finds a user by ID and returns their username.</summary>
     public async Task<string?> GetUsernameByIdAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
-        return user?.UserName;
+        return user?.IsDeleted == true ? DeletedUserDisplayName : user?.UserName;
     }
 
     public async Task<Dictionary<string, string>> GetUsernamesByIdsAsync(IEnumerable<string> userIds)
@@ -180,7 +251,9 @@ public class AuthService : IAuthService
         var ids = userIds.Distinct().ToList();
         return await _userManager.Users
             .Where(u => ids.Contains(u.Id))
-            .ToDictionaryAsync(u => u.Id, u => u.UserName ?? u.Id);
+            .ToDictionaryAsync(
+                u => u.Id,
+                u => u.IsDeleted ? DeletedUserDisplayName : u.UserName ?? u.Id);
     }
 
     // -------------------------------------------------------------------------

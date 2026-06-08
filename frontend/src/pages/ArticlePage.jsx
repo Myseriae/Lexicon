@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   getArticle,
   updateArticle,
@@ -37,6 +37,7 @@ const ArticlePage = () => {
   const [tagInput, setTagInput] = useState('');
   const [tagLoading, setTagLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { currentUser: authenticatedUser } = useAuth();
 
   // Fetch collaborators
@@ -117,6 +118,12 @@ const ArticlePage = () => {
       setActiveTab('article');
     }
   }, [activeTab, canEdit]);
+
+  useEffect(() => {
+    if (canEdit && searchParams.get('edit') === 'true') {
+      setEditMode(true);
+    }
+  }, [canEdit, searchParams]);
 
   useEffect(() => {
     if (canEdit && activeTab === 'revisions') {

@@ -1,0 +1,160 @@
+.profile-container {
+  color: #fff;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.profile-header,
+.section-heading,
+.profile-article-row,
+.profile-article-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-header {
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.profile-header h1,
+.profile-section h2,
+.profile-article-row h3 {
+  margin: 0;
+}
+
+.profile-header p,
+.profile-empty,
+.profile-article-row p,
+.danger-section p {
+  color: #aaa;
+}
+
+.profile-section {
+  background-color: rgba(27, 23, 34, 0.9);
+  border: 1px solid rgba(0, 207, 255, 0.25);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.account-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.account-details div {
+  background-color: #151515;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 1rem;
+  min-width: 0;
+}
+
+.account-details span,
+.delete-account-form label {
+  color: #00cfff;
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+}
+
+.account-details strong {
+  overflow-wrap: anywhere;
+}
+
+.section-heading {
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.profile-article-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profile-article-row {
+  justify-content: space-between;
+  background-color: #151515;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.profile-article-row p {
+  margin: 0.5rem 0 0;
+}
+
+.profile-article-actions {
+  flex-shrink: 0;
+}
+
+.danger-section {
+  border-color: rgba(255, 77, 77, 0.45);
+}
+
+.delete-account-form {
+  max-width: 420px;
+  margin-top: 1rem;
+}
+
+.delete-account-form input {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #222;
+  border: 1px solid #444;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.delete-account-form input:focus {
+  outline: none;
+  border-color: #00cfff;
+  box-shadow: 0 0 5px rgba(0, 207, 255, 0.3);
+}
+
+.delete-confirmation {
+  color: #ffb3b3;
+  margin-top: 0;
+}
+
+.profile-error,
+.profile-status {
+  margin: 2rem auto;
+  max-width: 700px;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.profile-error {
+  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.1);
+  border: 1px solid rgba(255, 77, 77, 0.5);
+}
+
+.profile-status {
+  color: #fff;
+}
+
+@media (max-width: 720px) {
+  .profile-container {
+    padding: 1rem;
+  }
+
+  .profile-header,
+  .profile-article-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .account-details {
+    grid-template-columns: 1fr;
+  }
+}

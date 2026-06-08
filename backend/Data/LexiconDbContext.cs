@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Lexicon.Data;
 
-public class LexiconDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
+public class LexiconDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
 {
     public LexiconDbContext(DbContextOptions<LexiconDbContext> options)
         : base(options)
@@ -23,7 +23,7 @@ public class LexiconDbContext : IdentityDbContext<IdentityUser, IdentityRole, st
     {
         base.OnModelCreating(modelBuilder);
 
-        var seedUser = new IdentityUser
+        var seedUser = new ApplicationUser
         {
             Id = "seed-user",
             UserName = "seeduser",
@@ -33,10 +33,11 @@ public class LexiconDbContext : IdentityDbContext<IdentityUser, IdentityRole, st
             EmailConfirmed = true,
             SecurityStamp = "STATIC_SECURITY_STAMP",
             ConcurrencyStamp = "STATIC_CONCURRENCY_STAMP",
-            PasswordHash = "AQAAAAIAAYagAAAAEL7yNihVlaTYLNGbmmYcPSdNZ9x5oCOZRC13du/DRVrQ+QGkJpqVdLFPBol4Bf8ZDg=="
+            PasswordHash = "AQAAAAIAAYagAAAAEL7yNihVlaTYLNGbmmYcPSdNZ9x5oCOZRC13du/DRVrQ+QGkJpqVdLFPBol4Bf8ZDg==",
+            IsDeleted = false
         };
 
-        modelBuilder.Entity<IdentityUser>().HasData(seedUser);
+        modelBuilder.Entity<ApplicationUser>().HasData(seedUser);
 
 
         modelBuilder.Entity<Tag>()
@@ -49,7 +50,7 @@ public class LexiconDbContext : IdentityDbContext<IdentityUser, IdentityRole, st
             .IsUnique();
 
         modelBuilder.Entity<Article>()
-            .HasOne<IdentityUser>()
+            .HasOne<ApplicationUser>()
             .WithMany()
             .HasForeignKey(a => a.AuthorId)
             .IsRequired();

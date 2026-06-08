@@ -1,5 +1,6 @@
 using System.Text;
 using Lexicon.Data;
+using Lexicon.Model;
 using Lexicon.Services;
 using Lexicon.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 // Load .env (for local dev without Docker). Does not override vars already set by the OS/Docker.
 DotNetEnv.Env.NoClobber().TraversePath().Load();
@@ -161,13 +163,33 @@ void AddAuthentication()
                 IssuerSigningKey         = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(issuerSigningKey))
             };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnTokenValidated = async context =>
+                {
+                    var userId = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+                    if (string.IsNullOrEmpty(userId))
+                    {
+                        context.Fail("Missing user id.");
+                        return;
+                    }
+
+                    var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+                    var user = await userManager.FindByIdAsync(userId);
+                    if (user is null || user.IsDeleted)
+                    {
+                        context.Fail("User account is not active.");
+                    }
+                }
+            };
         });
 }
 
 void AddIdentity()
 {
     builder.Services
-        .AddIdentityCore<IdentityUser>(options =>
+        .AddIdentityCore<ApplicationUser>(options =>
         {
             options.Password.RequireDigit           = false;
             options.Password.RequiredLength         = 6;

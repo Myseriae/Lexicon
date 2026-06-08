@@ -24,6 +24,18 @@ public class EFRefreshTokenRepository : IRefreshTokenRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task RevokeAllForUserAsync(string userId)
+    {
+        var tokens = await _context.RefreshTokens
+            .Where(r => r.UserId == userId && !r.IsRevoked)
+            .ToListAsync();
+
+        foreach (var token in tokens)
+            token.IsRevoked = true;
+
+        await _context.SaveChangesAsync();
+    }
+
     public async Task DeleteExpiredAndRevokedAsync(string userId)
     {
         var stale = await _context.RefreshTokens

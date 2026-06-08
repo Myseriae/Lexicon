@@ -17,6 +17,7 @@ import {
   logout as logoutRequest,
   refreshToken as refreshTokenRequest,
   register as registerRequest,
+  deleteAccount as deleteAccountRequest,
 } from '../api/authApi';
 import { registerRefreshHandler } from '../api/httpClient';
 import { decodeJwt } from '../utils/jwtUtils';
@@ -110,6 +111,14 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const deleteAccount = async (password) => {
+    try {
+      await deleteAccountRequest(password);
+    } finally {
+      clearAccessToken();
+    }
+  };
+
   const currentUser = decodeJwt(accessToken);
 
   const value = {
@@ -119,6 +128,7 @@ export function AuthProvider({ children }) {
     isInitializing,
     login,
     logout,
+    deleteAccount,
     refreshSession: refreshSessionRef.current,
     register,
   };

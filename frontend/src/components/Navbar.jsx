@@ -177,9 +177,14 @@ const Navbar = ({ onSearch }) => {
 
       <div className="navbar-right">
         {isAuthenticated ? (
-          <button className="logout-button" onClick={handleLogout}>
-            Logout
-          </button>
+          <>
+            <Link to="/profile" className="profile-button">
+              Profile
+            </Link>
+            <button className="logout-button" onClick={handleLogout}>
+              Logout
+            </button>
+          </>
         ) : !isInitializing ? (
           <>
             <Link to="/login" className="login-button">

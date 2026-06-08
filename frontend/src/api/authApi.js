@@ -38,6 +38,17 @@ export const logout = () =>
     { skipAuth: true, skipRefresh: true }
   );
 
+export const getProfile = () =>
+  requestJson('/api/auth/profile', {
+    method: 'GET',
+  });
+
+export const deleteAccount = (password) =>
+  requestJson('/api/auth/account', {
+    method: 'DELETE',
+    body: JSON.stringify({ password }),
+  });
+
 export const verifyToken = () =>
   requestJson(
     '/api/auth/verify',

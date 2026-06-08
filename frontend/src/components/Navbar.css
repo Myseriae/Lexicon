@@ -261,6 +261,7 @@
   outline-offset: 2px;
 }
 
+.profile-button,
 .logout-button {
   color: #f3f4f6;
   font-size: 0.875rem;
@@ -270,14 +271,17 @@
   border-radius: 0.375rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
+  text-decoration: none;
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
+.profile-button:hover,
 .logout-button:hover {
   border-color: #4b5563;
   color: #ffffff;
 }
 
+.profile-button:focus,
 .logout-button:focus {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
@@ -349,6 +353,7 @@
 
   .login-button,
   .register-button,
+  .profile-button,
   .logout-button {
     font-size: 0.8125rem;
     padding: 0.375rem 0.75rem;
@@ -390,10 +395,10 @@
 
   .login-button,
   .register-button,
+  .profile-button,
   .logout-button {
     font-size: 0.75rem;
     padding: 0.375rem 0.5rem;
   }
 }
-
 

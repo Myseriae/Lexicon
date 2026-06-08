@@ -134,6 +134,64 @@ public class AuthController : ControllerBase
     }
 
     // -------------------------------------------------------------------------
+    // GET /api/auth/profile
+    // Returns account details and articles authored by the current user
+    // -------------------------------------------------------------------------
+
+    [HttpGet("profile")]
+    [Authorize]
+    [ProducesResponseType(typeof(ProfileResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ProfileResponse>> Profile()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var profile = await _authService.GetProfileAsync(userId);
+        if (profile is null)
+        {
+            ClearRefreshTokenCookie();
+            return Unauthorized();
+        }
+
+        return Ok(profile);
+    }
+
+    // -------------------------------------------------------------------------
+    // DELETE /api/auth/account
+    // Soft-deletes and anonymizes the current user after password confirmation
+    // -------------------------------------------------------------------------
+
+    [HttpDelete("account")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountRequest request)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var result = await _authService.DeleteAccountAsync(userId, request.Password);
+        if (!result.Success)
+        {
+            foreach (var (key, message) in result.ErrorMessages)
+                ModelState.AddModelError(key, message);
+            return ValidationProblem();
+        }
+
+        ClearRefreshTokenCookie();
+
+        return NoContent();
+    }
+
+    // -------------------------------------------------------------------------
     // GET /api/auth/verify
     // Returns user info if token is valid
     // -------------------------------------------------------------------------

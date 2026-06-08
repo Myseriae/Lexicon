@@ -1,4 +1,5 @@
-﻿using Lexicon.Services.Authentication;
+﻿using Lexicon.DTOs;
+using Lexicon.Services.Authentication;
 
 namespace Lexicon.Services.Auth;
 
@@ -12,6 +13,10 @@ public interface IAuthService
     /// and stores a new refresh token (rotation).
     /// </summary>
     Task<AuthResult> RefreshAsync(string refreshToken);
+
+    Task<ProfileResponse?> GetProfileAsync(string userId);
+
+    Task<AuthResult> DeleteAccountAsync(string userId, string password);
 
     /// <summary>Revokes the refresh token so it can no longer be used.</summary>
     Task<bool> LogoutAsync(string refreshToken);
