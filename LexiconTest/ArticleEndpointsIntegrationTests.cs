@@ -10,13 +10,22 @@ namespace LexiconTest;
 [TestFixture]
 public class ArticleEndpointsIntegrationTests
 {
-    private TestWebApplicationFactory _factory = null!;
+    private static TestWebApplicationFactory _factory = null!;
     private HttpClient _client = null!;
 
-    [SetUp]
-    public void SetUp()
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
+        // Create the factory once for all tests in this class
         _factory = new TestWebApplicationFactory();
+    }
+
+    [SetUp]
+    public async Task SetUpAsync()
+    {
+        // Reset the database before each test to ensure isolation
+        await _factory.ResetDatabaseAsync();
+        
         _client = _factory.CreateClient();
     }
 
@@ -24,6 +33,12 @@ public class ArticleEndpointsIntegrationTests
     public void TearDown()
     {
         _client?.Dispose();
+    }
+
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        // Dispose the factory once after all tests
         _factory?.Dispose();
     }
 
