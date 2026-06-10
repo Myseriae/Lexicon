@@ -24,11 +24,43 @@ jobs:
       - name: Build solution
         run: dotnet build ./Lexicon.sln --configuration Release --no-restore
 
-      - name: Test
-        # Use --no-build so tests use the previously-built assemblies from the solution build
-        run: dotnet test ./Lexicon.sln --configuration Release --no-build --verbosity normal
+      - name: Test (with coverage)
+        # Use --no-build so tests use the previously-built assemblies from the solution build.
+        # Collect coverage with coverlet.collector (XPlat Code Coverage) and write results to TestResults/.
+        run: |
+          dotnet test ./Lexicon.sln \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults
         env:
           ASPNETCORE_ENVIRONMENT: Testing
+
+      - name: Upload coverage artifacts
+        # Upload the TestResults folder which contains the coverage files (coverage.cobertura.xml)
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage
+          path: TestResults/**
+
+      - name: Restore dotnet local tools
+        # Restores tools declared in .config/dotnet-tools.json (reportgenerator)
+        run: dotnet tool restore
+
+      - name: Generate coverage HTML report
+        # Use the local reportgenerator tool to convert cobertura XML to HTML
+        run: |
+          dotnet tool run reportgenerator -- \
+            -reports:TestResults/**/coverage.cobertura.xml \
+            -targetdir:coverage-report \
+            -reporttypes:Html;HtmlSummary
+
+      - name: Upload coverage HTML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: coverage-report
 
   frontend:
     name: Frontend (Node 22)
