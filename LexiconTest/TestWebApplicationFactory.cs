@@ -45,7 +45,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             services.AddSingleton(_connection);
             services.AddDbContext<LexiconDbContext>(options => options.UseSqlite(_connection));
 
-            services.AddHttpClient<IWikipediaService, WikipediaService>();
+            services.AddSingleton<IWikipediaService, StubWikipediaService>();
         });
     }
 
