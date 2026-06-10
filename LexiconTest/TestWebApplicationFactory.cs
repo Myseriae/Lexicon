@@ -28,7 +28,8 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 ["Jwt:ValidAudience"] = "lexicon-test-audience",
                 ["Jwt:IssuerSigningKey"] = "lexicon-test-signing-key-with-32-chars",
                 ["Jwt:AccessTokenExpirationMinutes"] = "60",
-                ["Jwt:RefreshTokenExpirationDays"] = "7"
+                ["Jwt:RefreshTokenExpirationDays"] = "7",
+                ["SA_PASSWORD"] = "DummyPassword123!"  // Dummy value for testing (not used, SQLite is used instead)
             });
         });
 

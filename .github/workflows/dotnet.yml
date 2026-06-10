@@ -18,17 +18,15 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Restore dependencies
-        working-directory: backend
-        run: dotnet restore
+      - name: Restore dependencies (solution)
+        run: dotnet restore ./Lexicon.sln
 
-      - name: Build
-        working-directory: backend
-        run: dotnet build --no-restore
+      - name: Build solution
+        run: dotnet build ./Lexicon.sln --configuration Release --no-restore
 
       - name: Test
-        working-directory: LexiconTest
-        run: dotnet test --no-build --verbosity normal
+        # Use --no-build so tests use the previously-built assemblies from the solution build
+        run: dotnet test ./Lexicon.sln --configuration Release --no-build --verbosity normal
         env:
           ASPNETCORE_ENVIRONMENT: Testing
 
