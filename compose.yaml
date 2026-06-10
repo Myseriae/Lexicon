@@ -22,22 +22,28 @@
     ports:
       - "5149:8080"
     environment:
-      - Jwt__IssuerSigningKey=${JWT_SIGNING_KEY}
-      - ASPNETCORE_ENVIRONMENT=Production
-      - SA_PASSWORD=${SA_PASSWORD}
-      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=Lexicon;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
+      Jwt__IssuerSigningKey: ${JWT_SIGNING_KEY}
+      ASPNETCORE_ENVIRONMENT: Production
+      SA_PASSWORD: ${SA_PASSWORD}
+      ConnectionStrings__DefaultConnection: "Server=db,1433;Database=Lexicon;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True"
     depends_on:
       db:
         condition: service_healthy
-        
 
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
 
   frontend:
     build: ./frontend
     ports:
       - "5173:80"
     depends_on:
-      - backend
-    
+      backend:
+        condition: service_healthy
+
 volumes:
   mssqldata:

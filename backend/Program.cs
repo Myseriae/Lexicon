@@ -18,6 +18,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
+// Add health check
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<LexiconDbContext>("database");
+
 // --- Application services ---
 builder.Services.AddScoped<IArticleRepository, EFArticleRepository>();
 builder.Services.AddScoped<IRevisionRepository, EFRevisionRepository>();
@@ -115,6 +119,27 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
     app.MapOpenApi();
 else
     app.UseHttpsRedirection();
+
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            results = report.Entries.Select(e => new
+            {
+                key = e.Key,
+                status = e.Value.Status.ToString(),
+                error = e.Value.Exception?.Message
+            })
+        });
+
+        await context.Response.WriteAsync(result);
+    }
+});
 
 app.UseCors("FrontendDev");
 
