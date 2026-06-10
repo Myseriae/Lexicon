@@ -111,6 +111,8 @@ appsettings.Production.json
 .directory
 .Trash-*
 .nfs*
+.DS_Store
+**/.DS_Store
 
 # ========================
 # Uploads & User Content
