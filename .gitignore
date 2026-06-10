@@ -17,6 +17,7 @@
 [Oo]bj/
 
 coverage-report/
+.DS_Store
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
