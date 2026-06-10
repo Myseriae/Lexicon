@@ -5,6 +5,7 @@ using Lexicon.Services;
 using Lexicon.Services.Auth;
 using Microsoft.Extensions.Logging;
 using Moq;
+using FluentAssertions;
 
 namespace LexiconTest;
 
@@ -47,7 +48,7 @@ public class ArticleServiceTests
 
         var result = await _service.AddArticleAsync(request, "test-user");
 
-        Assert.That(result.Summary, Is.EqualTo("Cat summary"));
+        result.Summary.Should().Be("Cat summary");
         _wikipediaMock.Verify(w => w.GetSummaryAsync("Cat"), Times.Once);
         _articleRepoMock.Verify(d => d.AddArticleAsync(It.IsAny<Article>()), Times.Once);
     }
@@ -63,7 +64,7 @@ public class ArticleServiceTests
 
         var result = await _service.AddArticleAsync(request, "test-user");
 
-        Assert.That(result.Summary, Is.EqualTo("Already exists"));
+        result.Summary.Should().Be("Already exists");
         _wikipediaMock.Verify(w => w.GetSummaryAsync(It.IsAny<string>()), Times.Never);
     }
 
@@ -82,7 +83,7 @@ public class ArticleServiceTests
 
         var result = await _service.AddArticleAsync(request, "test-user");
 
-        Assert.That(result.Summary, Is.Null.Or.Empty);
+        result.Summary.Should().BeNullOrEmpty();
         _articleRepoMock.Verify(d => d.AddArticleAsync(It.IsAny<Article>()), Times.Once);
     }
 
@@ -102,9 +103,9 @@ public class ArticleServiceTests
 
         var result = (await _service.SearchAsync("apple")).ToList();
 
-        Assert.That(result.Count, Is.EqualTo(2));
-        Assert.That(result.Any(a => a.Title == "Apple"), Is.True);
-        Assert.That(result.Any(a => a.Title == "Pineapple"), Is.True);
+        result.Should().HaveCount(2);
+        result.Should().Contain(a => a.Title == "Apple");
+        result.Should().Contain(a => a.Title == "Pineapple");
     }
 
     [Test]
@@ -116,7 +117,7 @@ public class ArticleServiceTests
 
         var result = await _service.DeleteArticleAsync(99, "test-user", false);
 
-        Assert.That(result, Is.False);
+        result.Should().BeFalse();
     }
 
     [Test]
@@ -130,7 +131,7 @@ public class ArticleServiceTests
 
         var result = await _service.UpdateArticleAsync(99, request, "test-user", false);
 
-        Assert.That(result, Is.False);
+        result.Should().BeFalse();
     }
 
     [Test]
@@ -164,7 +165,7 @@ public class ArticleServiceTests
 
         var result = await _service.UpdateArticleAsync(current.Id, request, "author-id", false);
 
-        Assert.That(result, Is.True);
+        result.Should().BeTrue();
         _revisionRepoMock.Verify(d => d.AddRevisionAsync(It.Is<Revision>(revision =>
             revision.ArticleId == current.Id &&
             revision.Content == current.Content &&
@@ -201,7 +202,7 @@ public class ArticleServiceTests
 
         var result = await _service.UpdateArticleAsync(current.Id, request, "author-id", false);
 
-        Assert.That(result, Is.True);
+        result.Should().BeTrue();
         _revisionRepoMock.Verify(d => d.AddRevisionAsync(It.IsAny<Revision>()), Times.Never);
     }
 
@@ -240,7 +241,7 @@ public class ArticleServiceTests
 
         var result = await _service.RollbackArticleAsync(current.Id, revision.Id, "author-id", false);
 
-        Assert.That(result, Is.True);
+        result.Should().BeTrue();
         _revisionRepoMock.Verify(d => d.AddRevisionAsync(It.Is<Revision>(saved =>
             saved.Content == current.Content &&
             saved.Summary == current.Summary &&

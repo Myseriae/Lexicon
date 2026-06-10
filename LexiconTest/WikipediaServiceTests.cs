@@ -1,6 +1,7 @@
 ﻿using Lexicon.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
+using FluentAssertions;
 using System.Net;
 
 namespace LexiconTest;
@@ -16,7 +17,7 @@ public class WikipediaServiceTests
 
         var result = await service.GetSummaryAsync("Test");
 
-        Assert.That(result, Is.Null);
+        result.Should().BeNull();
     }
 
     [Test]
@@ -34,7 +35,7 @@ public class WikipediaServiceTests
 
         var result = await service.GetSummaryAsync("Mercury");
 
-        Assert.That(result, Is.Null);
+        result.Should().BeNull();
     }
 
     [Test]
@@ -45,7 +46,7 @@ public class WikipediaServiceTests
 
         var result = await service.GetSummaryAsync("Cat");
 
-        Assert.That(result, Is.Null);
+        result.Should().BeNull();
     }
 
     [Test]
@@ -63,7 +64,7 @@ public class WikipediaServiceTests
 
         var result = await service.GetSummaryAsync("Cat");
 
-        Assert.That(result, Is.EqualTo("Cat is an animal\nSummaries may not be correct as they are received from outside sources."));
+        result.Should().Be("Cat is an animal\nSummaries may not be correct as they are received from outside sources.");
     }
 
     private HttpClient CreateClient(HttpStatusCode statusCode, string content)
