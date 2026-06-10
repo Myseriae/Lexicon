@@ -105,11 +105,19 @@ public class ArticleEndpointsIntegrationTests
         var registerResponse =
             await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
 
+        // Ensure registration succeeded and payload is present before using the token
+        registerResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
         var authPayload =
             await registerResponse.Content.ReadFromJsonAsync<AuthTokenResponse>();
 
+        authPayload.Should().NotBeNull();
+        authPayload!.AccessToken.Should().NotBeNullOrWhiteSpace();
+        authPayload.UserName.Should().Be(registerRequest.UserName);
+        authPayload.Role.Should().Be("Editor");
+
         _client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", authPayload!.AccessToken);
+            new AuthenticationHeaderValue("Bearer", authPayload.AccessToken);
 
         var createRequest = new CreateArticleRequest
         {
