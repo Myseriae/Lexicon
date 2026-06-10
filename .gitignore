@@ -80,6 +80,7 @@ appsettings.Production.json
 # .env files (if used for local dev)
 .env
 .env.*
+!.env.example
 
 # ========================
 # JetBrains Rider
@@ -112,6 +113,8 @@ appsettings.Production.json
 .directory
 .Trash-*
 .nfs*
+.DS_Store
+**/.DS_Store
 
 # ========================
 # Uploads & User Content
