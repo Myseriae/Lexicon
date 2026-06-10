@@ -79,6 +79,7 @@ appsettings.Production.json
 # .env files (if used for local dev)
 .env
 .env.*
+!.env.example
 
 # ========================
 # JetBrains Rider
