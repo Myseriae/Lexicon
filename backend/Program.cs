@@ -63,10 +63,13 @@ builder.Services.AddCors(options =>
 // the environment (set by .env locally or by Docker Compose in production).
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is missing.");
-var saPassword = builder.Configuration["SA_PASSWORD"]
-                 ?? throw new InvalidOperationException(
-                     "SA_PASSWORD is missing. Add it to .env or set it as an environment variable.");
-connectionString = connectionString.Replace("{SA_PASSWORD}", saPassword);
+
+var saPassword = builder.Configuration["SA_PASSWORD"];
+
+if (!string.IsNullOrEmpty(saPassword))
+{
+    connectionString = connectionString.Replace("{SA_PASSWORD}", saPassword);
+}
 
 builder.Services.AddDbContext<LexiconDbContext>(options =>
     options.UseSqlServer(connectionString));
