@@ -2,6 +2,20 @@
 
 A collaborative wiki/lexicon app where users create Markdown articles, tag them, invite collaborators, and articles keep a full revision history. Article summaries are auto-fetched from Wikipedia when not provided.
 
+## Screenshots
+
+Write articles in a split-pane Markdown editor with a live preview.
+
+![Create](assets/create.png)
+
+Manage who can edit an article by adding or removing collaborators.
+
+![Collaborators](assets/collaborators.png)
+
+Browse the full revision history of an article and roll back to any previous version.
+
+![Revisions](assets/revision.png)
+
 ## Tech Stack
 
 | Layer | Technology |
